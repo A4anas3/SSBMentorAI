@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+
+
+/* ===============================
+   SSB DESIGN SYSTEM — Tailwind v4
+   =============================== */
+
+@theme {
+  /* Backgrounds */
+  --color-background: hsl(220 14% 96%);
+  --color-foreground: hsl(220 70% 12%);
+
+  /* Cards */
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 70% 12%);
+
+  /* Primary (Navy) */
+  --color-primary: hsl(220 70% 15%);
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  /* Secondary (Sky) */
+  --color-secondary: hsl(200 60% 94%);
+  --color-secondary-foreground: hsl(220 70% 15%);
+
+  /* Accent (Saffron) */
+  --color-accent: hsl(35 80% 55%);
+  --color-accent-foreground: hsl(220 70% 12%);
+
+  /* Muted */
+  --color-muted: hsl(220 14% 92%);
+  --color-muted-foreground: hsl(220 20% 46%);
+
+  /* Borders */
+  --color-border: hsl(200 30% 85%);
+  --color-input: hsl(200 30% 85%);
+  --color-ring: hsl(220 70% 15%);
+
+  /* Radius */
+  --radius-lg: 0.5rem;
+
+  /* Fonts */
+  --font-sans: Inter, sans-serif;
+  --font-display: "Playfair Display", serif;
+}
+
+/* 🌙 Dark mode */
+.dark {
+  --color-background: hsl(220 70% 8%);
+  --color-foreground: hsl(220 14% 96%);
+  --color-card: hsl(220 70% 12%);
+  --color-border: hsl(220 60% 20%);
+}
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+
+  * {
+    @apply border-border;
+  }
+}
+@layer components {
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply shadow-lg border-accent -translate-y-1;
+  }
+
+  .section-title {
+    @apply relative inline-block pb-3;
+  }
+
+  .section-title::after {
+    content: "";
+    @apply absolute left-0 bottom-0 w-16 h-1 bg-accent rounded-full;
+  }
+}
+
