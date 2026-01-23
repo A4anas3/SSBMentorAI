@@ -1,38 +1,49 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import { useSamplePPDT } from "@/hooks/useSamplePPDT";
+import {
+  useDeletePPDTImage,
+  useToggleSamplePPDTImage,
+} from "@/hooks/usePPDTAdmin";
+import { Trash2, Star, StarOff, Check, X } from "lucide-react";
+import { IS_ADMIN } from "@/config/admin";
 
-/* =========================
-   LOADING COMPONENT
-   ========================= */
-const LoadingSpinner = () => {
-  return (
-    <div className="flex flex-col items-center justify-center py-32">
-      <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-      <p className="mt-4 text-gray-600 font-medium">Loading sample PPDT...</p>
-    </div>
-  );
-};
+/* ================= LOADING SPINNER ================= */
+const LoadingSpinner = () => (
+  <div className="flex flex-col items-center justify-center py-32">
+    <div className="w-10 h-10 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+    <p className="mt-3 text-sm text-gray-600 font-medium">
+      Loading sample PPDT...
+    </p>
+  </div>
+);
 
-/* =========================
-   REUSABLE SECTION COMPONENT
-   ========================= */
+/* ================= SECTION COMPONENT ================= */
 const Section = ({ title, children, highlight, success }) => {
   let bg = "";
   if (highlight) bg = "bg-yellow-50";
   if (success) bg = "bg-green-50";
 
   return (
-    <div className={`mb-4 p-4 rounded-xl ${bg}`}>
-      <h3 className="font-semibold mb-1">{title}</h3>
+    <div className={`mb-3 p-3 rounded-xl text-sm ${bg}`}>
+      <h3 className="font-semibold mb-1 text-gray-900">{title}</h3>
       <div className="text-gray-700 whitespace-pre-line">{children}</div>
     </div>
   );
 };
 
+/* ================= MAIN COMPONENT ================= */
 const SamplePPDT = () => {
   const { data, isLoading, isError } = useSamplePPDT();
+  const deleteMutation = useDeletePPDTImage();
+  const toggleMutation = useToggleSamplePPDTImage();
 
-  /* ================= LOADING ================= */
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [confirmToggleId, setConfirmToggleId] = useState(null);
+
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   if (isLoading) {
     return (
       <section className="pt-24">
@@ -42,8 +53,7 @@ const SamplePPDT = () => {
     );
   }
 
-  /* ================= ERROR ================= */
-  if (isError || !data || data.length === 0) {
+  if (isError) {
     return (
       <section className="pt-24">
         <Header />
@@ -54,76 +64,177 @@ const SamplePPDT = () => {
     );
   }
 
+  if (!data || data.length === 0) {
+    return (
+      <section className="pt-24">
+        <Header />
+        <div className="text-center py-32 text-gray-500 font-medium">
+          No sample PPDT stories available.
+        </div>
+      </section>
+    );
+  }
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const paginatedData = data.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
   return (
     <section className="py-16 pt-24 bg-background">
       <Header />
 
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* ================= PAGE TITLE ================= */}
-        <h1 className="text-3xl font-bold text-navy mb-4">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <h1 className="text-2xl font-bold text-navy mb-6">
           Sample Stories for PPDT
         </h1>
 
-        {/* ================= TIPS ================= */}
-        <div className="bg-blue-50 p-4 rounded-xl mb-10">
-          <h3 className="font-semibold mb-2">Tips to write a PPDT story</h3>
-          <ul className="list-disc pl-5 space-y-1 text-gray-700">
-            <li>Observe number of characters, age, gender, and mood</li>
-            <li>Identify the problem or situation shown in the picture</li>
-            <li>Follow a clear Past → Present → Future sequence</li>
-            <li>Show leadership, initiative, and responsibility</li>
-            <li>End the story with a positive and realistic outcome</li>
-          </ul>
-        </div>
+        {paginatedData.map((ppdt, index) => (
+          <div
+            key={ppdt.id}
+            className="mb-10 p-6 bg-white rounded-2xl shadow-md border border-gray-200 relative"
+          >
+            {/* ================= ADMIN ICONS ================= */}
+            {IS_ADMIN && (
+              <div className="absolute top-4 right-4 flex gap-2">
+                {/* TOGGLE */}
+                <button
+                  onClick={() =>
+                    setConfirmToggleId(
+                      confirmToggleId === ppdt.id ? null : ppdt.id,
+                    )
+                  }
+                  className={`p-2 rounded-full border
+                    ${
+                      ppdt.isSample
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                >
+                  {ppdt.isSample ? <StarOff size={16} /> : <Star size={16} />}
+                </button>
 
-        {/* ================= ALL SAMPLES ================= */}
-        {data.map((ppdt, index) => (
-          <div key={ppdt.id} className="mb-16">
-            <h2 className="text-2xl font-semibold mb-4">
-              Sample PPDT {index + 1}
+                {/* DELETE */}
+                <button
+                  onClick={() =>
+                    setConfirmDeleteId(
+                      confirmDeleteId === ppdt.id ? null : ppdt.id,
+                    )
+                  }
+                  className="p-2 rounded-full bg-red-100 text-red-600 border"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            )}
+
+            {/* ================= CONFIRM TOGGLE ================= */}
+            {confirmToggleId === ppdt.id && (
+              <div className="mb-4 p-3 rounded-lg bg-yellow-50 flex items-center justify-between text-sm">
+                <span>
+                  {ppdt.isSample ? "" : "Remove this image from samples?"}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      toggleMutation.mutate({
+                        id: ppdt.id,
+                        ...(ppdt.isSample
+                          ? {}
+                          : {
+                              action: "sample",
+                              sampleStory: ppdt.sampleStory,
+                            }),
+                      });
+                      setConfirmToggleId(null);
+                    }}
+                    className="px-3 py-1 bg-green-500 text-white rounded flex items-center gap-1"
+                  >
+                    <Check size={14} /> Confirm
+                  </button>
+                  <button
+                    onClick={() => setConfirmToggleId(null)}
+                    className="px-3 py-1 bg-gray-200 rounded flex items-center gap-1"
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ================= CONFIRM DELETE ================= */}
+            {confirmDeleteId === ppdt.id && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 flex items-center justify-between text-sm">
+                <span>Delete this PPDT image permanently?</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      deleteMutation.mutate(ppdt.id);
+                      setConfirmDeleteId(null);
+                    }}
+                    className="px-3 py-1 bg-red-500 text-white rounded flex items-center gap-1"
+                  >
+                    <Check size={14} /> Delete
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteId(null)}
+                    className="px-3 py-1 bg-gray-200 rounded flex items-center gap-1"
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <h2 className="text-lg font-semibold mb-4">
+              Sample PPDT {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
             </h2>
 
-            {/* IMAGE */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-5">
               <img
                 src={ppdt.imageUrl}
-                alt={`Sample PPDT ${index + 1}`}
-                className="w-full max-w-md rounded-2xl"
+                alt="PPDT"
+                className="w-full max-w-sm rounded-xl"
               />
             </div>
 
-            <Section title="Image Context">{ppdt.imageContext}</Section>
-
-            <Section title="Guide" highlight>
-              {ppdt.guide}
-            </Section>
-
-            <Section title="Action Taken">{ppdt.action}</Section>
-
-            <Section title="Observations">
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  <strong>Number of characters:</strong> 2
-                </li>
-                <li>
-                  <strong>Age:</strong> 20–25 years
-                </li>
-                <li>
-                  <strong>Gender:</strong> Male
-                </li>
-                <li>
-                  <strong>Mood:</strong> Serious, focused, responsible
-                </li>
-              </ul>
-            </Section>
-
-            <Section title="Sample Story" success>
-              {ppdt.sampleStory}
-            </Section>
-
-            <hr className="my-10 border-gray-300" />
+            {ppdt.imageContext && (
+              <Section title="Image Context">{ppdt.imageContext}</Section>
+            )}
+            {ppdt.guide && (
+              <Section title="Guide" highlight>
+                {ppdt.guide}
+              </Section>
+            )}
+            {ppdt.action && (
+              <Section title="Action Taken">{ppdt.action}</Section>
+            )}
+            {ppdt.sampleStory && (
+              <Section title="Sample Story" success>
+                {ppdt.sampleStory}
+              </Section>
+            )}
           </div>
         ))}
+
+        {/* PAGINATION */}
+        <div className="flex justify-center mt-10 gap-2 flex-wrap">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border
+                ${
+                  currentPage === i + 1
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-50 hover:bg-yellow-500"
+                }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );

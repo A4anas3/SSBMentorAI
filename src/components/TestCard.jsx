@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Trash2 } from "lucide-react";
 
 const TestCard = ({
   title,
@@ -7,50 +8,86 @@ const TestCard = ({
   icon: Icon,
   href = "/",
   variant = "default",
+
+  // ✅ Admin props
+  showDelete = false,
+  onDelete,
+
+  // ✅ Size control
+  size = "normal", // "small" | "normal"
 }) => {
   const isNavy = variant === "navy";
 
+  // ✅ Dynamic styles based on size
+  const imageHeight = size === "small" ? "h-32" : "h-48";
+  const padding = size === "small" ? "p-4" : "p-6";
+  const titleSize = size === "small" ? "text-lg" : "text-xl";
+  const descSize = size === "small" ? "text-xs" : "text-sm";
+
   return (
-    <Link
-      to={href}
-      className={`block rounded-xl overflow-hidden card-hover cursor-pointer ${
-        isNavy
-          ? "bg-primary text-primary-foreground"
-          : "bg-card border border-sky-border"
-      }`}
-    >
-      {/* Image */}
-      <div className="relative overflow-hidden sky-overlay">
-        <img src={image} alt={title} className="w-full h-48 object-cover" />
-        {Icon && (
-          <div
-            className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center ${
-              isNavy ? "bg-accent" : "bg-accent/90"
+    <div className="relative group">
+      {/* ✅ Delete Icon (Admin Only) */}
+      {showDelete && onDelete && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute top-2 right-2 z-20 bg-red-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition"
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
+
+      <Link
+        to={href}
+        className={`block rounded-xl overflow-hidden card-hover cursor-pointer transition-all duration-200 ${
+          isNavy
+            ? "bg-primary text-primary-foreground"
+            : "bg-card border border-sky-border hover:shadow-lg"
+        }`}
+      >
+        {/* ✅ Image */}
+        <div className="relative overflow-hidden sky-overlay">
+          <img
+            src={image}
+            alt={title}
+            className={`w-full ${imageHeight} object-cover`}
+          />
+
+          {/* ✅ Optional Icon */}
+          {Icon && (
+            <div
+              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center ${
+                isNavy ? "bg-accent" : "bg-accent/90"
+              }`}
+            >
+              <Icon size={18} className="text-primary" />
+            </div>
+          )}
+        </div>
+
+        {/* ✅ Content */}
+        <div className={padding}>
+          <h3
+            className={`${titleSize} font-display font-semibold mb-1 ${
+              isNavy ? "text-primary-foreground" : "text-primary"
             }`}
           >
-            <Icon size={20} className="text-primary" />
-          </div>
-        )}
-      </div>
+            {title}
+          </h3>
 
-      {/* Content */}
-      <div className="p-6">
-        <h3
-          className={`text-xl font-display font-semibold mb-2 ${
-            isNavy ? "text-primary-foreground" : "text-primary"
-          }`}
-        >
-          {title}
-        </h3>
-        <p
-          className={`text-sm leading-relaxed ${
-            isNavy ? "text-primary-foreground/80" : "text-muted-foreground"
-          }`}
-        >
-          {description}
-        </p>
-      </div>
-    </Link>
+          <p
+            className={`${descSize} leading-relaxed ${
+              isNavy ? "text-primary-foreground/80" : "text-muted-foreground"
+            }`}
+          >
+            {description}
+          </p>
+        </div>
+      </Link>
+    </div>
   );
 };
 

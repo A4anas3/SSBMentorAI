@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "./ui/button.jsx";
+import { Link } from "react-router-dom";
 
 const navLinks = [
-  { name: "Roadmap", href: "#roadmap" },
+  { name: "Roadmap", href: "/front/roadmap" },
   { name: "News", href: "#news" },
   { name: "Screening Test", href: "#screening" },
   { name: "Psychological Tests", href: "#psychological" },

@@ -1,7 +1,8 @@
 import { Mail, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const footerLinks = [
-  { name: "Roadmap", href: "#roadmap" },
+  { name: "Roadmap", href: "/front/roadmap" },
   { name: "Screening", href: "#screening" },
   { name: "Psychological Tests", href: "#psychological" },
   { name: "GTO Tasks", href: "#gto" },

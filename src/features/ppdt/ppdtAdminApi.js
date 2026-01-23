@@ -1,0 +1,36 @@
+import { api } from "@/lib/api";
+
+/* ======================
+   ADMIN: GET ALL IMAGES
+   ====================== */
+export const fetchAllPPDTImagesAdmin = async () => {
+  const { data } = await api.get("/admin/ppdt/images");
+  return data;
+};
+
+/* ======================
+   ADMIN: ADD IMAGE
+   ====================== */
+export const addPPDTImage = async (payload) => {
+  const { data } = await api.post("/admin/ppdt/image", payload);
+  return data;
+};
+
+/* ======================
+   ADMIN: DELETE IMAGE
+   ====================== */
+export const deletePPDTImage = async (id) => {
+  await api.delete(`/admin/ppdt/image/${id}`);
+};
+
+export const updatePPDTImage = async ({ id, payload }) => {
+  const { data } = await api.put(`/admin/ppdt/image/${id}`, payload);
+  return data;
+};
+export const toggleSamplePPDTImage = async ({ id, action, sampleStory }) => {
+  const { data } = await api.put(`/admin/ppdt/image/${id}/toggle-sample`, {
+    action,
+    sampleStory,
+  });
+  return data;
+};

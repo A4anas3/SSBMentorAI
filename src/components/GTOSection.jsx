@@ -4,6 +4,8 @@ import { Target, Mic } from "lucide-react";
 import gpeImage from "@/assets/card-gpe.jpg";
 import lecturetteImage from "@/assets/card-lecturette.jpg";
 
+import { Link } from "react-router-dom";
+
 const gtoTests = [
   {
     title: "GPE - Group Planning Exercise",
@@ -11,7 +13,7 @@ const gtoTests = [
       "Collaborate with your group to analyze problems, discuss solutions, and plan effective strategies.",
     image: gpeImage,
     icon: Target,
-    href: "#gpe",
+    href: "/gpe",
   },
   {
     title: "Lecturette",
@@ -19,7 +21,7 @@ const gtoTests = [
       "Deliver a 3-minute impromptu talk on given topics, showcasing your communication and knowledge.",
     image: lecturetteImage,
     icon: Mic,
-    href: "#lecturette",
+    href: "/lecturettes",
   },
 ];
 
