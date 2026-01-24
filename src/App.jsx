@@ -56,6 +56,10 @@ const EditSrtPage = lazy(() => import("@/pages/SRT/EditSrtPage"));
 const AddSrtPage = lazy(() => import("@/pages/SRT/AddSrtPage"));
 const AddWatPage = lazy(() => import("@/pages/Wat/AddWatPage"));
 const EditWatPage = lazy(() => import("@/pages/Wat/EditWatPage"));
+const SdtPage = lazy(() => import("@/pages/SDT/SdtPage"));
+const SdtAbout = lazy(() => import("@/pages/SDT/SdtAbout"));
+const SdtSample = lazy(() => import("@/pages/SDT/SdtSample"));
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -117,6 +121,9 @@ const App = () => (
             <Route path="/admin/srt/add" element={<AddSrtPage />} />
             <Route path="/admin/wat/add" element={<AddWatPage />} />
             <Route path="/admin/wat/edit/:id" element={<EditWatPage />} />
+            <Route path="/sdt" element={<SdtPage />} />
+            <Route path="/sdt/about" element={<SdtAbout />} />
+            <Route path="/sdt/sample" element={<SdtSample />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

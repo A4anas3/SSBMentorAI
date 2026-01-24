@@ -37,7 +37,7 @@ const psychTests = [
       "Describe yourself from multiple perspectives - parents, friends, teachers, and your own view.",
     image: sdtImage,
     icon: Users,
-    href: "#sdt",
+    href: "/sdt",
   },
 ];
 
