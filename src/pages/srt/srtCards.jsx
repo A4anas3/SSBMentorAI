@@ -1,5 +1,8 @@
 import SectionTitle from "@/components/SectionTitle.jsx";
 import TestCard from "@/components/TestCard.jsx";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
 import { AlertTriangle, BookOpen, Brain } from "lucide-react";
 import srtImage from "@/assets/card-srt.jpg";
 
@@ -32,21 +35,32 @@ const srtCards = [
 
 const SrtPage = () => {
   return (
-    <section className="py-16 lg:py-24 bg-muted/30">
-      <div className="container mx-auto px-4">
-        <SectionTitle
-          title="Situation Reaction Test (SRT)"
-          subtitle="Learn concepts, explore examples, and practice with AI-driven feedback."
-          centered
-        />
+    <>
+      {/* 🔝 Global Header */}
+      <Header />
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {srtCards.map((card) => (
-            <TestCard key={card.title} {...card} />
-          ))}
-        </div>
-      </div>
-    </section>
+      {/* 📄 Page Content */}
+      <main className="pt-10 bg-muted/30 min-h-screen">
+        <section className="py-16 lg:py-24">
+          <div className="container mx-auto px-4">
+            <SectionTitle
+              title="Situation Reaction Test (SRT)"
+              subtitle="Learn concepts, explore examples, and practice with AI-driven feedback."
+              centered
+            />
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {srtCards.map((card) => (
+                <TestCard key={card.title} {...card} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* 🔻 Global Footer */}
+      <Footer />
+    </>
   );
 };
 

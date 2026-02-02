@@ -11,7 +11,7 @@ const screeningTests = [
       "Verbal and non-verbal reasoning tests to assess your cognitive abilities and logical thinking capacity.",
     image: oirImage,
     icon: Brain,
-    href: "#oir",
+    href: "/oir",
   },
   {
     title: "PPDT - Picture Perception",

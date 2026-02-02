@@ -1,13 +1,16 @@
 import { Button } from "./ui/button.jsx";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight, Shield, Brain, Bot, Target } from "lucide-react";
 import heroImage from "../assets/hero-officer.jpg";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="pt-24 lg:pt-32 pb-16 lg:pb-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
+          {/* ================= LEFT CONTENT ================= */}
           <div className="animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary rounded-full mb-6">
               <Shield size={16} className="text-accent" />
@@ -21,47 +24,67 @@ const HeroSection = () => {
             </h1>
 
             <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-lg">
-              Master the SSB Interview with comprehensive preparation materials,
-              expert guidance, and structured practice for all psychological and
-              group testing phases.
+              Master the SSB Interview with structured preparation, realistic
+              practice, and AI-powered evaluation designed for officer-level
+              thinking.
             </p>
 
+            {/* ================= CTA BUTTONS ================= */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="accent" size="lg" className="gap-2">
+              <Button
+                variant="accent"
+                size="lg"
+                className="gap-2"
+                onClick={() => {
+                  const section = document.getElementById("screening");
+                  section?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }}
+              >
                 Start Preparation
                 <ArrowRight size={18} />
               </Button>
-              <Button variant="outline" size="lg">
+
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate("/front/roadmap")}
+              >
                 View Roadmap
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-border">
-              <div>
-                <p className="text-2xl lg:text-3xl font-display font-bold text-primary">
-                  100+
-                </p>
-                <p className="text-sm text-muted-foreground">Practice Tests</p>
-              </div>
-              {/* <div>
-                <p className="text-2xl lg:text-3xl font-display font-bold text-primary">
-                  10K+
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Students Trained
+            {/* ================= FEATURES ================= */}
+            <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-border">
+              <div className="flex flex-col gap-1">
+                <Brain className="text-accent mb-1" size={22} />
+                <p className="font-semibold text-primary">AI Analysis</p>
+                <p className="text-xs text-muted-foreground">
+                  Psychological response evaluation
                 </p>
               </div>
-              <div>
-                <p className="text-2xl lg:text-3xl font-display font-bold text-primary">
-                  85%
+
+              <div className="flex flex-col gap-1">
+                <Bot className="text-accent mb-1" size={22} />
+                <p className="font-semibold text-primary">AI Interview</p>
+                <p className="text-xs text-muted-foreground">
+                  Personalised SSB-style questioning
                 </p>
-                <p className="text-sm text-muted-foreground">Success Rate</p>
-              </div> */}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Target className="text-accent mb-1" size={22} />
+                <p className="font-semibold text-primary">Officer Mindset</p>
+                <p className="text-xs text-muted-foreground">
+                  Real test-like practice scenarios
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Right Image */}
+          {/* ================= RIGHT IMAGE ================= */}
           <div
             className="relative animate-fade-in"
             style={{ animationDelay: "0.2s" }}
@@ -83,12 +106,13 @@ const HeroSection = () => {
                 <div>
                   <p className="font-semibold text-primary">SSB Ready</p>
                   <p className="text-xs text-muted-foreground">
-                    Complete Preparation
+                    AI-Powered Preparation
                   </p>
                 </div>
               </div>
             </div>
           </div>
+          {/* ================================================= */}
         </div>
       </div>
     </section>

@@ -59,6 +59,21 @@ const EditWatPage = lazy(() => import("@/pages/Wat/EditWatPage"));
 const SdtPage = lazy(() => import("@/pages/SDT/SdtPage"));
 const SdtAbout = lazy(() => import("@/pages/SDT/SdtAbout"));
 const SdtSample = lazy(() => import("@/pages/SDT/SdtSample"));
+const News = lazy(() => import("@/pages/News/News"));
+const TATPage = lazy(() => import("@/pages/TAT/TATPage"));
+const TATAbout = lazy(() => import("@/pages/TAT/TATAbout"));
+const OirPage = lazy(() => import("@/pages/OIR/OirPage"));
+const OirAbout = lazy(() => import("@/pages/OIR/OirAbout"));
+const OirPracticeList = lazy(() => import("@/pages/OIR/OirPracticeList"));
+const OirTestPage = lazy(() => import("@/pages/OIR/OirTestPage"));
+const OirEditPage = lazy(() => import("@/pages/OIR/OirEditPage"));
+const OirCreatePage = lazy(() => import("@/pages/OIR/OirCreatePage"));
+const TatSample = lazy(() => import("@/pages/TAT/TatSample"));
+const TatSampleDetail = lazy(() => import("@/pages/TAT/TatSampleDetail"));
+const TatTestList = lazy(() => import("@/pages/TAT/TatTestList"));
+const TatTestAttempt = lazy(() => import("@/pages/TAT/TatTestAttempt"));
+const TatAdd = lazy(() => import("@/pages/TAT/TatAdd"));
+const TatEdit = lazy(() => import("@/pages/TAT/TatEdit"));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -124,6 +139,22 @@ const App = () => (
             <Route path="/sdt" element={<SdtPage />} />
             <Route path="/sdt/about" element={<SdtAbout />} />
             <Route path="/sdt/sample" element={<SdtSample />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/tat" element={<TATPage />} />
+            <Route path="/tat/about" element={<TATAbout />} />
+            <Route path="/oir" element={<OirPage />} />
+            <Route path="/oir/about" element={<OirAbout />} />
+            <Route path="/oir/practice" element={<OirPracticeList />} />
+            <Route path="/oir/practice/:id" element={<OirTestPage />} />
+            <Route path="/oir/admin/edit/:id" element={<OirEditPage />} />
+            <Route path="/oir/admin" element={<OirCreatePage />} />
+            <Route path="/tat/sample" element={<TatSample />} />
+            <Route path="/tat/sample/:id" element={<TatSampleDetail />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/tat/test" element={<TatTestList />} />
+            <Route path="/tat/test/:id" element={<TatTestAttempt />} />
+            <Route path="/tat/admin" element={<TatAdd />} />
+            <Route path="/admin/tat/edit/:id" element={<TatEdit />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

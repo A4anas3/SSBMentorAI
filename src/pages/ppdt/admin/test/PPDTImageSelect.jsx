@@ -17,7 +17,6 @@ const PPDTImageSelect = () => {
   const deleteMutation = useDeletePPDTImage();
   const toggleMutation = useToggleSamplePPDTImage();
 
-  // track which image's form is open
   const [activeToggleId, setActiveToggleId] = useState(null);
 
   if (isLoading) {
@@ -34,7 +33,7 @@ const PPDTImageSelect = () => {
         {/* TIPS */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-            <li>Images are intentionally blurred</li>
+            <li>Images are intentionally blurred during the test</li>
             <li>Click image to start PPDT test</li>
             <li>Image visible for 30 seconds only</li>
             <li>Sample image is for reference only</li>
@@ -73,11 +72,11 @@ const PPDTImageSelect = () => {
                   </button>
                 )}
 
-                {/* IMAGE */}
+                {/* IMAGE (NO BLUR) */}
                 <img
                   src={img.imageUrl}
                   alt="PPDT"
-                  className="w-full h-36 object-cover rounded-t-xl blur-sm"
+                  className="w-full h-36 object-cover rounded-t-xl"
                 />
 
                 {/* BODY */}
@@ -89,7 +88,6 @@ const PPDTImageSelect = () => {
                   {/* ADMIN CONTROLS */}
                   {IS_ADMIN && (
                     <div className="flex justify-center gap-2 mt-3">
-                      {/* ADD SAMPLE */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -102,7 +100,6 @@ const PPDTImageSelect = () => {
                         Add Sample
                       </button>
 
-                      {/* ADMIN PREVIEW */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -115,7 +112,7 @@ const PPDTImageSelect = () => {
                     </div>
                   )}
 
-                  {/* TOGGLE FORM (ONLY FOR ACTIVE IMAGE) */}
+                  {/* TOGGLE FORM */}
                   {IS_ADMIN && activeToggleId === img.id && (
                     <div className="mt-4">
                       <AdminSampleToggleForm
@@ -128,9 +125,7 @@ const PPDTImageSelect = () => {
                               sampleStory,
                             },
                             {
-                              onSuccess: () => {
-                                setActiveToggleId(null);
-                              },
+                              onSuccess: () => setActiveToggleId(null),
                             },
                           )
                         }

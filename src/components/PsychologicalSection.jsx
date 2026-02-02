@@ -13,7 +13,7 @@ const psychTests = [
       "Write creative stories based on pictures to reveal your personality traits and thought patterns.",
     image: tatImage,
     icon: Eye,
-    href: "#tat",
+    href: "/tat",
   },
   {
     title: "WAT - Word Association Test",
