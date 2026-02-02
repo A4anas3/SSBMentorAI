@@ -74,6 +74,7 @@ const TatTestList = lazy(() => import("@/pages/TAT/TatTestList"));
 const TatTestAttempt = lazy(() => import("@/pages/TAT/TatTestAttempt"));
 const TatAdd = lazy(() => import("@/pages/TAT/TatAdd"));
 const TatEdit = lazy(() => import("@/pages/TAT/TatEdit"));
+const GpeTestAttempt = lazy(() => import("@/pages/GPE/GpeTestAttempt"));
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -155,6 +156,7 @@ const App = () => (
             <Route path="/tat/test/:id" element={<TatTestAttempt />} />
             <Route path="/tat/admin" element={<TatAdd />} />
             <Route path="/admin/tat/edit/:id" element={<TatEdit />} />
+            <Route path="/gpe/test/:id" element={<GpeTestAttempt />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

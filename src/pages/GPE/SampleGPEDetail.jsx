@@ -59,17 +59,15 @@ const SampleGPEDetail = () => {
           />
         </div>
 
-        {/* ❓ Problem Statement */}
+        {/* ❓ Narrative */}
         <div className="bg-card border border-sky-border rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-semibold text-primary mb-2">
-            Problem Statement
-          </h3>
+          <h3 className="text-lg font-semibold text-primary mb-2">Narrative</h3>
           <p className="text-muted-foreground leading-relaxed">
             {gpe.question}
           </p>
         </div>
 
-        {/* ✅ Model Solution / Plan */}
+        {/* ✅ Model Group Plan */}
         {gpe.plans && gpe.plans.length > 0 && (
           <div className="bg-card border border-sky-border rounded-xl p-6">
             <h3 className="text-lg font-semibold text-primary mb-4">
@@ -96,6 +94,12 @@ const SampleGPEDetail = () => {
             </div>
           </div>
         )}
+
+        {/* 📝 Short Advice */}
+        <p className="mt-6 text-xs text-muted-foreground italic text-center">
+          Note: This is only a sample solution. Candidates should frame their
+          own plan based on their understanding of the situation.
+        </p>
       </div>
     </section>
   );

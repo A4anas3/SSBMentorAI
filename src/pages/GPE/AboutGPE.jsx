@@ -17,11 +17,11 @@ const AboutGPE = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         <SectionTitle
           title="Group Planning Exercise (GPE)"
-          subtitle="Complete SSB-level guide with strategy, structure, and tips."
+          subtitle="Complete SSB-level guide covering conduct, approach, priorities, and evaluation."
           centered
         />
 
-        {/* ✅ Hero Info Cards */}
+        {/* 🔹 Hero Info Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm hover:shadow-md transition">
             <Shield className="text-primary mb-3" />
@@ -29,121 +29,131 @@ const AboutGPE = () => {
               What is GPE?
             </h4>
             <p className="text-sm text-muted-foreground">
-              A group task in SSB to test planning, leadership, and teamwork.
+              A GTO group task where candidates plan and solve multiple
+              real-life problems on a model map.
             </p>
           </div>
 
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm hover:shadow-md transition">
             <Brain className="text-primary mb-3" />
             <h4 className="font-semibold text-lg text-primary mb-2">
-              Skills Tested
+              What is Tested?
             </h4>
             <p className="text-sm text-muted-foreground">
-              Logical thinking, decision-making, communication, and OLQs.
+              Planning ability, logical reasoning, leadership, teamwork, and
+              OLQs.
             </p>
           </div>
 
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm hover:shadow-md transition">
             <Users className="text-primary mb-3" />
             <h4 className="font-semibold text-lg text-primary mb-2">
-              Group Task
+              Group Outcome
             </h4>
             <p className="text-sm text-muted-foreground">
-              Candidates discuss real-life problems and present a final plan.
+              The group must arrive at one common, practical, and time-bound
+              plan.
             </p>
           </div>
         </div>
 
-        {/* ✅ Main Content Sections */}
+        {/* 🔹 Main Content */}
         <div className="space-y-8">
-          {/* Section Box Component Style */}
+          {/* Introduction */}
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm">
             <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <Target size={20} /> Introduction to GPE
+              <Target size={20} /> Introduction
             </h3>
             <p className="text-muted-foreground">
-              Group Planning Exercise (GPE) is conducted during the GTO stage of
-              the SSB interview to evaluate a candidate’s ability to analyze
-              complex situations, plan effectively, work in a team, and show
-              leadership qualities.
+              Group Planning Exercise (GPE) is the second task conducted in the
+              GTO series of the SSB interview. It assesses a candidate’s ability
+              to understand a complex situation, prioritize problems, utilize
+              available resources, and work effectively in a group.
             </p>
             <p className="mt-2 text-muted-foreground">
-              Candidates are given a model map with multiple problems such as
-              accidents, disasters, or threats, and they must propose a group
-              solution within a limited time.
+              Unlike Group Discussion, GPE requires the group to reach a
+              definite conclusion in the form of a common group plan.
             </p>
           </div>
 
-          {/* Aim */}
+          {/* Conduct */}
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm">
             <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <Shield size={20} /> Aim of GPE
-            </h3>
-            <ul className="grid md:grid-cols-2 gap-2 list-disc pl-6 text-muted-foreground">
-              <li>Assess planning and organizing ability</li>
-              <li>Evaluate leadership and teamwork</li>
-              <li>Test logical reasoning and decision-making</li>
-              <li>Observe communication skills</li>
-              <li>Judge initiative and responsibility</li>
-            </ul>
-          </div>
-
-          {/* Structure */}
-          <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm">
-            <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <Users size={20} /> Structure of GPE
+              <Users size={20} /> Conduct of GPE (Five Stages)
             </h3>
             <ol className="list-decimal pl-6 space-y-1 text-muted-foreground">
-              <li>Explanation of model by GTO</li>
-              <li>Individual analysis and planning</li>
-              <li>Group discussion</li>
-              <li>Final group plan preparation</li>
-              <li>Presentation by a candidate</li>
+              <li>Explanation of the model by the GTO</li>
+              <li>Reading of the problem narrative</li>
+              <li>Silent study of story card and model correlation</li>
+              <li>Individual written solution (10 minutes)</li>
+              <li>Group discussion to evolve a common plan</li>
             </ol>
           </div>
 
-          {/* Time Distribution */}
+          {/* Problem Prioritization */}
+          <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm">
+            <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
+              <Shield size={20} /> Problem Prioritization
+            </h3>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
+              <li>
+                <b>First Priority:</b> Life-threatening emergencies (accidents,
+                severe injuries, disasters)
+              </li>
+              <li>
+                <b>Second Priority:</b> Threats to many lives or government
+                property
+              </li>
+              <li>
+                <b>Third Priority:</b> Individual danger cases (kidnapping,
+                medical emergencies)
+              </li>
+              <li>
+                <b>Last Priority:</b> Minor or economic issues (lost cattle,
+                property disputes)
+              </li>
+            </ul>
+          </div>
+
+          {/* Time */}
           <div className="p-6 rounded-xl bg-card border border-sky-border shadow-sm">
             <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
               <Clock size={20} /> Time Distribution
             </h3>
             <div className="grid md:grid-cols-2 gap-2 text-muted-foreground">
-              <p>• Model explanation: 5 minutes</p>
-              <p>• Individual planning: 10 minutes</p>
+              <p>• Model explanation & story: ~10 minutes</p>
+              <p>• Individual written plan: 10 minutes</p>
               <p>• Group discussion: 15–20 minutes</p>
               <p>• Final presentation: 5 minutes</p>
             </div>
           </div>
 
-          {/* OLQs */}
-          <div className="p-6 rounded-xl bg-gradient-to-br from-primary/5 to-accent/10 border border-sky-border rounded-xl shadow-sm">
+          {/* Evaluation */}
+          <div className="p-6 rounded-xl bg-gradient-to-br from-primary/5 to-accent/10 border border-sky-border shadow-sm">
             <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
-              <Brain size={20} /> Officer Like Qualities (OLQs)
+              <Brain size={20} /> What the GTO Observes
             </h3>
-            <div className="grid md:grid-cols-3 gap-2 text-muted-foreground text-sm">
-              <span>• Leadership</span>
-              <span>• Initiative</span>
-              <span>• Responsibility</span>
-              <span>• Confidence</span>
-              <span>• Cooperation</span>
-              <span>• Reasoning Ability</span>
-              <span>• Communication</span>
-              <span>• Decision Making</span>
-              <span>• Team Spirit</span>
-            </div>
+            <ul className="list-disc pl-6 text-muted-foreground space-y-1">
+              <li>Ability to grasp essential details</li>
+              <li>Logical problem prioritization</li>
+              <li>Effective use of available resources</li>
+              <li>Time and distance estimation</li>
+              <li>Clarity of expression</li>
+              <li>Cooperation and leadership during discussion</li>
+            </ul>
           </div>
 
           {/* Mistakes */}
-          <div className="p-6 rounded-xl bg-card border border-red-200 shadow-sm">
+          <div className="p-6 rounded-xl bg-card border border-red-300 shadow-sm">
             <h3 className="text-xl font-semibold text-red-600 mb-3 flex items-center gap-2">
               <AlertTriangle size={20} /> Common Mistakes
             </h3>
             <ul className="list-disc pl-6 text-muted-foreground">
-              <li>Dominating the discussion</li>
-              <li>Remaining silent</li>
-              <li>Unrealistic solutions</li>
-              <li>Ignoring teammates</li>
-              <li>Lack of confidence</li>
+              <li>Dominating or remaining silent</li>
+              <li>Ignoring priority order</li>
+              <li>Unrealistic assumptions</li>
+              <li>Overuse of imaginary resources</li>
+              <li>Forgetting the final aim</li>
             </ul>
           </div>
 
@@ -153,11 +163,11 @@ const AboutGPE = () => {
               Tips to Perform Well in GPE
             </h3>
             <ul className="list-disc pl-6 text-green-700/80">
-              <li>Think logically and practically</li>
-              <li>Communicate clearly and confidently</li>
-              <li>Show leadership with cooperation</li>
-              <li>Respect others’ ideas</li>
-              <li>Practice regularly</li>
+              <li>Think calmly and logically</li>
+              <li>Initiate discussion but don’t dominate</li>
+              <li>Support others and invite silent members</li>
+              <li>Be flexible if better logic emerges</li>
+              <li>Maintain a confident and composed demeanor</li>
             </ul>
           </div>
 
@@ -167,10 +177,10 @@ const AboutGPE = () => {
               Conclusion
             </h3>
             <p className="text-muted-foreground">
-              GPE is not just about solving problems but about demonstrating
-              officer-like qualities. Candidates who show logical thinking,
-              teamwork, leadership, and responsibility stand out in the SSB
-              interview.
+              GPE evaluates how well a candidate thinks, plans, cooperates, and
+              leads under pressure. Candidates who balance logic with teamwork
+              and maintain focus on the aim leave a strong impression on the
+              GTO.
             </p>
           </div>
         </div>
