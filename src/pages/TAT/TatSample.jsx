@@ -11,9 +11,11 @@ import { Image } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const TatSample = () => {
+  const isUserAdmin = isAdmin();
+
   const { data, isLoading, error } = useTatTestCards();
   const { deleteTat } = useTatAdmin();
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ const TatSample = () => {
   const [selectedId, setSelectedId] = useState(null);
 
   const handleDeleteClick = (id) => {
+    const isUserAdmin = isAdmin();
+
     setSelectedId(id);
     setShowAlert(true);
   };
@@ -35,11 +39,15 @@ const TatSample = () => {
   };
 
   const handleCancelDelete = () => {
+    const isUserAdmin = isAdmin();
+
     setShowAlert(false);
     setSelectedId(null);
   };
 
   const handleEdit = (id) => {
+    const isUserAdmin = isAdmin();
+
     navigate(`/admin/tat/edit/${id}`);
   };
 
@@ -77,9 +85,9 @@ const TatSample = () => {
               href={`/tat/sample/${test.id}`}
               size="small"
               /* ✅ Admin Controls */
-              showDelete={IS_ADMIN}
+              showDelete={isUserAdmin}
               onDelete={() => handleDeleteClick(test.id)}
-              showEdit={IS_ADMIN}
+              showEdit={isUserAdmin}
               onEdit={() => handleEdit(test.id)}
             />
           ))}

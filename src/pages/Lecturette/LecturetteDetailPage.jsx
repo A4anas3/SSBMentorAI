@@ -5,9 +5,11 @@ import Header from "@/components/Header";
 import { useState } from "react";
 import EditLecturetteModal from "@/pages/Lecturette/EditLecturetteModal";
 import { Pencil } from "lucide-react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const LecturetteDetailPage = () => {
+  const isUserAdmin = isAdmin();
+
   const [openEdit, setOpenEdit] = useState(false);
 
   const { id } = useParams();
@@ -34,7 +36,7 @@ const LecturetteDetailPage = () => {
       {/* ✅ relative container for absolute edit button */}
       <div className="container mx-auto px-4 max-w-4xl relative">
         {/* ✅ Admin Edit Button */}
-        {IS_ADMIN && (
+        {isUserAdmin && (
           <button
             onClick={() => setOpenEdit(true)}
             className="absolute top-0 right-0 flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg shadow-md hover:bg-accent/90"
@@ -89,7 +91,7 @@ const LecturetteDetailPage = () => {
       </div>
 
       {/* ✅ Edit Modal should be OUTSIDE content */}
-      {IS_ADMIN && (
+      {isUserAdmin && (
         <EditLecturetteModal
           open={openEdit}
           onClose={() => setOpenEdit(false)}

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Button } from "./ui/button.jsx";
+import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
+import { login, signup } from "@/lib/authApi";
 
 const navLinks = [
   { name: "Home", type: "route", to: "/" },
   { name: "Roadmap", type: "route", to: "/front/roadmap" },
   { name: "News", type: "route", to: "/news" },
-
   { name: "Screening Test", type: "section", id: "screening" },
   { name: "Psychological Tests", type: "section", id: "psychological" },
   { name: "GTO Tasks", type: "section", id: "gto" },
@@ -16,14 +17,16 @@ const navLinks = [
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const scrollToSection = (sectionId) => {
     const el = document.getElementById(sectionId);
     if (!el) return;
 
-    const yOffset = -80; // fixed header height
+    const yOffset = -80;
     const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
     window.scrollTo({ top: y, behavior: "smooth" });
@@ -41,10 +44,10 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card header-shadow">
+    <header className="fixed top-0 left-0 right-0 z-40 bg-card header-shadow">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* LOGO → HOME */}
+          {/* LOGO */}
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2"
@@ -78,17 +81,35 @@ const Header = () => {
             )}
           </nav>
 
-          {/* LOGIN */}
-          <div className="hidden lg:block">
-            <Button variant="accent" size="sm">
-              Login
-            </Button>
+          {/* DESKTOP AUTH */}
+          <div className="hidden lg:flex items-center gap-3">
+            {!isAuthenticated ? (
+              <>
+                <Button variant="ghost" size="sm" onClick={login}>
+                  Login
+                </Button>
+
+                <Button variant="accent" size="sm" onClick={signup}>
+                  Sign Up
+                </Button>
+              </>
+            ) : (
+              <>
+                <span className="text-sm font-medium text-primary">
+                  {user?.name || "User"}
+                </span>
+
+                <Button variant="outline" size="sm" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
 
           {/* MOBILE MENU BUTTON */}
           <button
             className="lg:hidden p-2 text-primary"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -96,7 +117,11 @@ const Header = () => {
 
         {/* MOBILE NAV */}
         {mobileMenuOpen && (
-          <div className="lg:hidden pb-4 border-t border-border">
+          <div
+            className="lg:hidden fixed top-16 right-0 w-[45%]
+              bg-slate-50 border-l border-slate-200
+              rounded-l-sm shadow-lg pb-4 z-40"
+          >
             <nav className="flex flex-col gap-2 pt-4">
               {navLinks.map((link) =>
                 link.type === "route" ? (
@@ -106,7 +131,7 @@ const Header = () => {
                       navigate(link.to);
                       setMobileMenuOpen(false);
                     }}
-                    className="text-sm text-primary text-left hover:text-yellow-500"
+                    className="text-sm text-center text-primary hover:text-yellow-500"
                   >
                     {link.name}
                   </button>
@@ -114,16 +139,39 @@ const Header = () => {
                   <button
                     key={link.name}
                     onClick={() => handleSectionNav(link.id)}
-                    className="text-sm text-primary text-left hover:text-yellow-500"
+                    className="text-sm text-center text-primary hover:text-yellow-500"
                   >
                     {link.name}
                   </button>
                 ),
               )}
 
-              <Button variant="accent" className="mt-4 w-full">
-                Login
-              </Button>
+              {!isAuthenticated ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="mt-4 w-full"
+                    onClick={login}
+                  >
+                    Login
+                  </Button>
+
+                  <Button variant="accent" className="w-full" onClick={signup}>
+                    Sign Up
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="destructive"
+                  className="mt-4 w-full hover:bg-yellow-500"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Logout ({user?.name || "User"})
+                </Button>
+              )}
             </nav>
           </div>
         )}

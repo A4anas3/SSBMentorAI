@@ -11,11 +11,13 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Plus } from "lucide-react";
 import { useLecturetteAdmin } from "@/hooks/lecturette/useLecturetteAdmin";
 import AddLecturetteModal from "@/pages/Lecturette/AddLecturetteModal";
-import { IS_ADMIN } from "@/config/admin"; // ✅ IMPORT ADMIN FLAG
+import { isAdmin } from "@/config/admin"; // ✅ IMPORT ADMIN FLAG
 
 const categories = ["All", "Defence", "Social", "Education", "Technology"];
 
 const LecturettePage = () => {
+  const isUserAdmin = isAdmin();
+
   const { toast } = useToast();
   const { data, isLoading, refetch } = useLecturettes();
   const { search, filterByCategory } = useLecturetteSearch();
@@ -121,7 +123,7 @@ const LecturettePage = () => {
           </select>
 
           {/* ✅ Add Button ONLY for Admin */}
-          {IS_ADMIN && (
+          {isUserAdmin && (
             <button
               onClick={() => setOpenAdd(true)}
               className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 whitespace-nowrap"
@@ -150,7 +152,7 @@ const LecturettePage = () => {
                 image="/lecturette-default.jpg"
                 href={`/lecturette/${item.id}`}
                 // ✅ Delete icon ONLY for Admin
-                showDelete={IS_ADMIN}
+                showDelete={isUserAdmin}
                 onDelete={() => setDeleteId(item.id)}
                 size="small"
               />
@@ -160,12 +162,12 @@ const LecturettePage = () => {
       </div>
 
       {/* ✅ Add Modal (Admin Only) */}
-      {IS_ADMIN && (
+      {isUserAdmin && (
         <AddLecturetteModal open={openAdd} onClose={() => setOpenAdd(false)} />
       )}
 
       {/* Delete Confirmation Modal (Admin Only) */}
-      {IS_ADMIN && deleteId && (
+      {isUserAdmin && deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-87.5 shadow-lg">
             <h2 className="text-lg font-semibold mb-3">Delete Lecturette?</h2>

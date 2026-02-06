@@ -11,15 +11,16 @@ export const useTatAdmin = () => {
   const createMutation = useMutation({
     mutationFn: createTat,
     onSuccess: () => {
-      queryClient.invalidateQueries(["tat"]);
+      queryClient.invalidateQueries(["tat", "cards"]);
     },
   });
 
   /* ✅ Patch */
   const patchMutation = useMutation({
     mutationFn: patchTat,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["tat"]);
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(["tat", "cards"]);
+      queryClient.invalidateQueries(["tat", "detail", variables.id]);
     },
   });
 
@@ -27,7 +28,7 @@ export const useTatAdmin = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteTat,
     onSuccess: () => {
-      queryClient.invalidateQueries(["tat"]);
+      queryClient.invalidateQueries(["tat", "cards"]);
     },
   });
 
@@ -37,7 +38,7 @@ export const useTatAdmin = () => {
     deleteTat: deleteMutation.mutateAsync,
 
     isCreating: createMutation.isPending,
-    isPatching: patchMutation.isPending,
+    isUpdating: patchMutation.isPending,
     isDeleting: deleteMutation.isPending,
   };
 };

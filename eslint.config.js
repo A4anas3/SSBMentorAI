@@ -23,7 +23,14 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Warn about unused variables, but allow uppercase (constants) and underscore prefix
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
+
+      // Warn on console usage in production (allow warn/error for important logs)
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+
+      // Enforce exhaustive dependencies in useEffect, useCallback, etc.
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 ])

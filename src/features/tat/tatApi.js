@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import api from "@/lib/api";
 
 /* ======================
    USER APIs
@@ -33,8 +33,9 @@ export const createTat = async (payload) => {
 };
 
 // Patch TAT test
+// ✅ CORRECT
 export const patchTat = async ({ id, payload }) => {
-  const res = await api.get(`/api/admin/tat/tests/${id}`);
+  const res = await api.patch(`/api/admin/tat/tests/${id}`, payload);
   return res.data;
 };
 

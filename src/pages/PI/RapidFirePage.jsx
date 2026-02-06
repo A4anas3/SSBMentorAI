@@ -4,10 +4,13 @@ import { useRapidFire } from "@/hooks/interview/useRapidFire";
 import { useRapidFireAdmin } from "@/hooks/interview/useRapidFire";
 import { ChevronDown, Plus, Trash2, Pencil } from "lucide-react";
 import { useState } from "react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 import { useNavigate } from "react-router-dom";
 
 const RapidFirePage = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const navigate = useNavigate();
   const { data, isLoading, error } = useRapidFire();
   const { deleteRapidFire } = useRapidFireAdmin();
@@ -54,7 +57,7 @@ const RapidFirePage = () => {
             subtitle="Learn how to answer quickly, confidently, and honestly in SSB interview."
           />
 
-          {IS_ADMIN && (
+          {isUserAdmin && (
             <button
               onClick={() => navigate("/admin/rapid-fire/add")}
               className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90"
@@ -85,7 +88,7 @@ const RapidFirePage = () => {
                 className="border border-sky-border rounded-xl bg-sky-50/60 dark:bg-sky-900/20 relative"
               >
                 {/* ✅ Admin Icons */}
-                {IS_ADMIN && (
+                {isUserAdmin && (
                   <div className="absolute top-3 right-3 flex gap-2">
                     {/* Edit */}
                     <button
@@ -185,9 +188,9 @@ const RapidFirePage = () => {
       </div>
 
       {/* ✅ Delete Alert Modal */}
-      {IS_ADMIN && deleteId && (
+      {isUserAdmin && deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-[350px] shadow-lg">
+          <div className="bg-white rounded-xl p-6 w-87.5 shadow-lg">
             <h2 className="text-lg font-semibold mb-3">
               Delete Rapid Fire Sequence?
             </h2>

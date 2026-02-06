@@ -30,7 +30,7 @@ const GpeTestAttempt = () => {
         </button>
 
         {/* 💡 TOP TIPS */}
-        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-amber-200 rounded-xl p-5">
+        <div className="bg-linear-to-br from-yellow-50 to-amber-50 border border-amber-200 rounded-xl p-5">
           <h3 className="text-base font-semibold text-amber-800 mb-2">
             💡 Tips Before You Start
           </h3>

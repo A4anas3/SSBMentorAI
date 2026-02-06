@@ -27,7 +27,7 @@ const sdtCards = [
       "Write your own self-description and get AI-based analysis, feedback, and improvement suggestions.",
     image: sdtImage,
     icon: Brain,
-    href: "/sdt",
+    href: "/sdt/AI-soon",
   },
 ];
 

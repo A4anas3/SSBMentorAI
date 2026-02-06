@@ -4,8 +4,8 @@ import { useParams } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { usePPDTTestImages, useSubmitPPDT } from "@/hooks/usePPDTTest";
 
-const IMAGE_TIME = 3;
-const WRITE_TIME = 10; // 4 minutes
+const IMAGE_TIME = 30;
+const WRITE_TIME = 4 * 60; // 4 minutes
 
 const PPDTTest = () => {
   const { imageId } = useParams();
@@ -86,20 +86,20 @@ const PPDTTest = () => {
 
           {/* 🖼️ / 📝 RIGHT PANEL */}
           <section className="md:col-span-9">
-            <div className="bg-white rounded-xl shadow-sm p-6 min-h-[420px] flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-sm p-6 min-h-105 flex items-center justify-center">
               {/* IMAGE PHASE (BLURRED) */}
               {phase === "IMAGE" && (
                 <img
                   src={image.imageUrl}
                   alt="PPDT"
-                  className="max-h-[380px] w-auto object-contain 
+                  className="max-h-95 w-auto object-contain 
                              blur-[1.5px] contrast-90 brightness-95"
                 />
               )}
 
               {/* WRITE NOTICE PHASE */}
               {phase === "WRITE" && (
-                <div className="w-full h-[360px] flex flex-col items-center justify-center text-center border-2 border-dashed border-red-300 rounded-xl bg-red-50">
+                <div className="w-full h-90 flex flex-col items-center justify-center text-center border-2 border-dashed border-red-300 rounded-xl bg-red-50">
                   <div className="text-6xl mb-4 text-red-600">⏱️</div>
 
                   <h2 className="text-xl font-semibold text-red-700 mb-2">

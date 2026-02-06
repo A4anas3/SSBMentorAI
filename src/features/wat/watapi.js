@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import api from "@/lib/api";
 
 /* ======================
    GET WAT TEST NAMES (CARDS)

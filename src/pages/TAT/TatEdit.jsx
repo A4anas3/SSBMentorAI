@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { api } from "@/lib/api";
+import api from "@/lib/api";
 
 const emptyImage = {
   id: null, // 🔥 IMPORTANT
@@ -78,7 +78,7 @@ const TatEdit = () => {
         images, // 🔥 ids preserved → backend PATCH works correctly
       });
 
-      navigate("/tat/test");
+      navigate("/tat/sample");
     } catch (err) {
       console.error(err);
       alert("Failed to update TAT test");
@@ -162,7 +162,7 @@ const TatEdit = () => {
                   placeholder="Model Story (optional)"
                   value={img.story || ""}
                   onChange={(e) => updateImage(index, "story", e.target.value)}
-                  className="w-full border rounded-lg px-4 py-2 min-h-[120px]"
+                  className="w-full border rounded-lg px-4 py-2 min-h-30"
                 />
               </div>
             </div>

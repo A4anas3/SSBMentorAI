@@ -4,10 +4,13 @@ import Header from "@/components/Header.jsx";
 import TestCard from "@/components/TestCard.jsx";
 import { useGpeTest } from "@/hooks/gpe/useGpe";
 import { useGpeAdmin } from "@/hooks/gpe/useGpeAdmin";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 import { useNavigate } from "react-router-dom";
 
 const GpeTestPage = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const navigate = useNavigate();
   const { data: testList, isLoading, error } = useGpeTest();
   const { deleteGpe, isDeleting } = useGpeAdmin();
@@ -23,7 +26,7 @@ const GpeTestPage = () => {
     }
   };
 
-  // ✅ Loading State
+  /* ================= LOADING ================= */
   if (isLoading) {
     return (
       <section className="py-16 pt-24 bg-background">
@@ -35,7 +38,7 @@ const GpeTestPage = () => {
     );
   }
 
-  // ✅ Error State
+  /* ================= ERROR ================= */
   if (error) {
     return (
       <section className="py-16 pt-24 bg-background">
@@ -47,6 +50,7 @@ const GpeTestPage = () => {
     );
   }
 
+  /* ================= UI ================= */
   return (
     <section className="py-16 pt-24 bg-background">
       <Header />
@@ -58,29 +62,31 @@ const GpeTestPage = () => {
           centered
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 ">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {testList?.map((gpe, index) => (
             <TestCard
               key={gpe.id}
               title={`GPE Test ${index + 1}`}
-              description={gpe.question?.slice(0, 80) + "..."}
+              description={`${gpe.question?.slice(0, 80)}...`}
               image={gpe.imageUrl}
               href={`/gpe/test/${gpe.id}`}
               size="normal"
-              showDelete={IS_ADMIN}
+              // ✅ admin-only actions
+              showDelete={isUserAdmin}
               onDelete={() => setDeleteId(gpe.id)}
-              showEdit={IS_ADMIN}
+              showEdit={isUserAdmin}
               onEdit={() => navigate(`/admin/gpe/edit/${gpe.id}`)}
-              blurImage={!IS_ADMIN}
+              // ✅ non-admin users see blurred image
+              blurImage={!isUserAdmin}
             />
           ))}
         </div>
       </div>
 
-      {/* ✅ Delete Confirmation Modal */}
-      {IS_ADMIN && deleteId && (
+      {/* ================= DELETE CONFIRM ================= */}
+      {isUserAdmin && deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-[350px] shadow-lg">
+          <div className="bg-white rounded-xl p-6 w-87.5 shadow-lg">
             <h2 className="text-lg font-semibold mb-3">Delete GPE Test?</h2>
             <p className="text-sm text-gray-600 mb-5">
               Are you sure you want to delete this GPE test?

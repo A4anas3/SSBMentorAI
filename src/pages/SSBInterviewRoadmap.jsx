@@ -426,7 +426,7 @@ export default function SSBInterviewRoadmap() {
                   <ul className="space-y-2">
                     {d.points.map((p, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <span className="w-2 h-2 rounded-full bg-saffron mt-2 flex-shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-saffron mt-2 shrink-0" />
                         <span className="text-muted-foreground">{p}</span>
                       </li>
                     ))}
@@ -584,7 +584,7 @@ export default function SSBInterviewRoadmap() {
                 "General fitness",
               ].map((t, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="w-2 h-2 rounded-full bg-saffron mt-2 flex-shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-saffron mt-2 shrink-0" />
                   <span className="text-muted-foreground">{t}</span>
                 </li>
               ))}

@@ -1,36 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import {
+  fetchTatTestCards,
+  fetchTatTestById,
+  fetchTatSampleByTestId,
+} from "@/features/tat/tatapi";
 
 /* ======================
-   QUERY KEYS (LOCAL)
+   QUERY KEYS
 ====================== */
 const TAT_KEYS = {
   cards: ["tat", "cards"],
   detail: (id) => ["tat", "detail", id],
   sample: (id) => ["tat", "sample", id],
 };
-
-/* ======================
-   API FUNCTIONS (LOCAL)
-====================== */
-const fetchTatTestCards = async () => {
-  const res = await api.get("/api/tat/tests");
-  return res.data;
-};
-
-const fetchTatTestById = async (id) => {
-  const res = await api.get(`/api/tat/tests/${id}`);
-  return res.data;
-};
-
-const fetchTatSampleByTestId = async (id) => {
-  const res = await api.get(`/api/tat/tests/sample/${id}`);
-  return res.data;
-};
-
-/* ======================
-   HOOKS
-====================== */
 
 // 1️⃣ Cards
 export const useTatTestCards = () =>

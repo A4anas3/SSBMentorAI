@@ -5,9 +5,12 @@ import Header from "@/components/Header.jsx";
 import { useSampleGpe } from "@/hooks/gpe/useGpe";
 import { useGpeAdmin } from "@/hooks/gpe/useGpeAdmin";
 import ConfirmAlert from "@/components/ConfirmAlert";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const SampleGPEPage = () => {
+  // ✅ compute admin once
+  const isUserAdmin = isAdmin();
+
   const { data: gpeList, isLoading, error } = useSampleGpe();
   const { deleteGpe } = useGpeAdmin();
 
@@ -18,6 +21,7 @@ const SampleGPEPage = () => {
     setDeleteId(null);
   };
 
+  /* ================= LOADING ================= */
   if (isLoading) {
     return (
       <section className="py-16 pt-24 bg-background">
@@ -29,6 +33,7 @@ const SampleGPEPage = () => {
     );
   }
 
+  /* ================= ERROR ================= */
   if (error) {
     return (
       <section className="py-16 pt-24 bg-background">
@@ -40,6 +45,7 @@ const SampleGPEPage = () => {
     );
   }
 
+  /* ================= UI ================= */
   return (
     <section className="py-16 pt-24 bg-background">
       <Header />
@@ -61,15 +67,15 @@ const SampleGPEPage = () => {
               href={`/gpe/sample/${gpe.id}`}
               size="normal"
               variant="default"
-              // ✅ ADMIN DELETE ICON
-              showDelete={IS_ADMIN}
+              // ✅ admin-only delete
+              showDelete={isUserAdmin}
               onDelete={() => setDeleteId(gpe.id)}
             />
           ))}
         </div>
       </div>
 
-      {/* ✅ Confirm Alert */}
+      {/* ================= CONFIRM DELETE ================= */}
       <ConfirmAlert
         show={!!deleteId}
         title="Delete GPE?"

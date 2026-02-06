@@ -61,7 +61,7 @@ const TatSampleDetail = () => {
               <img
                 src={activeImage.imageUrl}
                 alt="TAT Sample"
-                className="w-full h-[360px] object-cover"
+                className="w-full h-90 object-cover"
               />
 
               {/* Content */}

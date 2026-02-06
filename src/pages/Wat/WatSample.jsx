@@ -8,9 +8,12 @@ import watImage from "@/assets/card-wat.jpg";
 import { BookOpen, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { IS_ADMIN } from "@/config/admin"; // 👈 your admin flag
+import { isAdmin } from "@/config/admin";
 
 const WatSample = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const { data, isLoading, error } = useWatTestNames();
   const { deleteWat } = useWatAdmin();
   const navigate = useNavigate();
@@ -18,6 +21,8 @@ const WatSample = () => {
   // ✅ Alert State
   const [showAlert, setShowAlert] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
+  /* ================= HANDLERS ================= */
 
   const handleDeleteClick = (id) => {
     setSelectedId(id);
@@ -40,11 +45,29 @@ const WatSample = () => {
     navigate(`/admin/wat/edit/${id}`);
   };
 
-  if (isLoading) return <p className="text-center mt-20">Loading...</p>;
-  if (error)
+  /* ================= STATES ================= */
+
+  if (isLoading) {
     return (
-      <p className="text-center mt-20 text-red-500">Error loading tests</p>
+      <section className="py-16 pt-24 bg-background">
+        <Header />
+        <p className="text-center mt-20 text-muted-foreground">
+          Loading WAT tests...
+        </p>
+      </section>
     );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 pt-24 bg-background">
+        <Header />
+        <p className="text-center mt-20 text-red-500">Error loading tests</p>
+      </section>
+    );
+  }
+
+  /* ================= UI ================= */
 
   return (
     <section className="py-16 pt-24 bg-background">
@@ -59,7 +82,7 @@ const WatSample = () => {
           />
 
           {/* ✅ Admin Only Add Button */}
-          {IS_ADMIN && (
+          {isUserAdmin && (
             <button
               onClick={() => navigate("/admin/wat/add")}
               className="mt-4 lg:mt-0 inline-flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-primary/90 transition"
@@ -82,9 +105,9 @@ const WatSample = () => {
               href={`/wat/sample/${test.id}`}
               size="small"
               /* ✅ Admin Only Icons */
-              showDelete={IS_ADMIN}
+              showDelete={isUserAdmin}
               onDelete={() => handleDeleteClick(test.id)}
-              showEdit={IS_ADMIN}
+              showEdit={isUserAdmin}
               onEdit={() => handleEdit(test.id)}
             />
           ))}

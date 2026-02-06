@@ -78,7 +78,7 @@ const AddLecturetteModal = ({ open, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl p-6 w-[750px] max-h-[90vh] overflow-y-auto shadow-xl relative">
+      <div className="bg-white rounded-xl p-6 w-187.5 max-h-[90vh] overflow-y-auto shadow-xl relative">
         {/* ❌ Close Button */}
         <button
           onClick={onClose}

@@ -5,7 +5,7 @@ import ConfirmAlert from "@/components/ConfirmAlert";
 
 import { useOirTestNames } from "@/hooks/oir/useOir";
 import { deleteOir } from "@/features/oir/oirapi";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 import oirImage from "@/assets/card-oir.jpg";
 import { Brain, Clock, AlertTriangle } from "lucide-react";
@@ -15,6 +15,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 const OirPracticeList = () => {
+  const isUserAdmin = isAdmin();
+
   const { data, isLoading, error } = useOirTestNames();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -92,8 +94,8 @@ const OirPracticeList = () => {
               href={`/oir/practice/${test.id}`}
               size="small"
               /* 🔐 ADMIN FEATURES */
-              showEdit={IS_ADMIN}
-              showDelete={IS_ADMIN}
+              showEdit={isUserAdmin}
+              showDelete={isUserAdmin}
               onEdit={() => navigate(`/oir/admin/edit/${test.id}`)}
               onDelete={() => {
                 setSelectedTestId(test.id);

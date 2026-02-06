@@ -62,7 +62,7 @@ const AddWatPage = () => {
         </div>
 
         {/* ✅ Words Form */}
-        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+        <div className="space-y-4 max-h-125 overflow-y-auto pr-2">
           {words.map((w, index) => (
             <div
               key={w.wordNo}

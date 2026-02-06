@@ -102,19 +102,19 @@ const TatTestAttempt = () => {
 
             {/* 🖼️ / 📝 RIGHT SIDE */}
             <section className="col-span-12 md:col-span-9">
-              <div className="bg-background rounded-xl shadow-sm p-6 min-h-[480px] flex items-center justify-center">
+              <div className="bg-background rounded-xl shadow-sm p-6 min-h-120 flex items-center justify-center">
                 {/* IMAGE PHASE */}
                 {phase === "IMAGE" && (
                   <img
                     src={image.imageUrl}
                     alt="TAT"
-                    className="max-h-[420px] w-auto object-contain"
+                    className="max-h-105 w-auto object-contain"
                   />
                 )}
 
                 {/* WRITE PHASE – NOTE PANEL */}
                 {phase === "WRITE" && (
-                  <div className="w-full h-[380px] flex flex-col items-center justify-center text-center border-2 border-dashed border-red-300 rounded-xl bg-red-50">
+                  <div className="w-full h-95 flex flex-col items-center justify-center text-center border-2 border-dashed border-red-300 rounded-xl bg-red-50">
                     <div className="text-6xl mb-4 text-red-600">⏱️</div>
 
                     <h2 className="text-xl font-semibold text-red-700 mb-2">

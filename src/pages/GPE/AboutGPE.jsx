@@ -129,7 +129,7 @@ const AboutGPE = () => {
           </div>
 
           {/* Evaluation */}
-          <div className="p-6 rounded-xl bg-gradient-to-br from-primary/5 to-accent/10 border border-sky-border shadow-sm">
+          <div className="p-6 rounded-xl bg-linear-to-br from-primary/5 to-accent/10 border border-sky-border shadow-sm">
             <h3 className="text-xl font-semibold text-primary mb-3 flex items-center gap-2">
               <Brain size={20} /> What the GTO Observes
             </h3>
@@ -158,7 +158,7 @@ const AboutGPE = () => {
           </div>
 
           {/* Tips */}
-          <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 shadow-sm">
+          <div className="p-6 rounded-xl bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 shadow-sm">
             <h3 className="text-xl font-semibold text-green-700 mb-3">
               Tips to Perform Well in GPE
             </h3>

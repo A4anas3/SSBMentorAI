@@ -14,7 +14,7 @@ import img2 from "@/assets/card-ppdt.jpg";
 import img3 from "@/assets/Sampleppdt.png";
 import adminAddImg from "@/assets/Sampleppdt.png";
 import adminAllImg from "@/assets/Sampleppdt.png";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const ppdtPractice = [
   {
@@ -70,7 +70,8 @@ const adminCards = [
 ];
 
 const PPDTPractice = () => {
-  const cards = IS_ADMIN ? [...ppdtPractice, ...adminCards] : ppdtPractice;
+  const isUserAdmin = isAdmin();
+  const cards = isUserAdmin ? [...ppdtPractice, ...adminCards] : ppdtPractice;
 
   return (
     <section className="py-16 lg:py-24 mx-auto bg-background">

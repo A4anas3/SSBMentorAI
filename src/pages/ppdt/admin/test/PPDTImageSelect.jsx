@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Eye } from "lucide-react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 import {
   useDeletePPDTImage,
   useToggleSamplePPDTImage,
@@ -11,6 +11,9 @@ import AdminSampleToggleForm from "@/pages/ppdt/admin/AdminSampleToggleForm";
 import { useState } from "react";
 
 const PPDTImageSelect = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const { data: images = [], isLoading } = usePPDTTestImages();
   const navigate = useNavigate();
 
@@ -43,7 +46,7 @@ const PPDTImageSelect = () => {
         {/* GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           {images.map((img, index) => {
-            const canUserOpenTest = !IS_ADMIN;
+            const canUserOpenTest = !isUserAdmin;
 
             return (
               <div
@@ -59,8 +62,8 @@ const PPDTImageSelect = () => {
                   }
                 }}
               >
-                {/* DELETE (ADMIN) */}
-                {IS_ADMIN && (
+                {/* DELETE (ADMIN ONLY) */}
+                {isUserAdmin && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -72,7 +75,7 @@ const PPDTImageSelect = () => {
                   </button>
                 )}
 
-                {/* IMAGE (NO BLUR) */}
+                {/* IMAGE */}
                 <img
                   src={img.imageUrl}
                   alt="PPDT"
@@ -86,7 +89,7 @@ const PPDTImageSelect = () => {
                   </p>
 
                   {/* ADMIN CONTROLS */}
-                  {IS_ADMIN && (
+                  {isUserAdmin && (
                     <div className="flex justify-center gap-2 mt-3">
                       <button
                         onClick={(e) => {
@@ -113,7 +116,7 @@ const PPDTImageSelect = () => {
                   )}
 
                   {/* TOGGLE FORM */}
-                  {IS_ADMIN && activeToggleId === img.id && (
+                  {isUserAdmin && activeToggleId === img.id && (
                     <div className="mt-4">
                       <AdminSampleToggleForm
                         onClose={() => setActiveToggleId(null)}

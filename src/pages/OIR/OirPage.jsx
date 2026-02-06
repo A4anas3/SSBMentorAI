@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Info, Brain, PlusCircle } from "lucide-react";
 import oirImage from "@/assets/card-oir.jpg";
 
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const oirCards = [
   {
@@ -28,6 +28,8 @@ const oirCards = [
 ];
 
 const OirPage = () => {
+  const isUserAdmin = isAdmin();
+
   return (
     <>
       {/* 🔝 Header */}
@@ -49,7 +51,7 @@ const OirPage = () => {
               ))}
 
               {/* 🔐 Admin-only Card */}
-              {IS_ADMIN && (
+              {isUserAdmin && (
                 <TestCard
                   title="Add New OIR Test"
                   description="Create and manage new OIR question sets for screening practice."

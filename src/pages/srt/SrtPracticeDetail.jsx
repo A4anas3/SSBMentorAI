@@ -88,7 +88,7 @@ const SrtPracticeDetail = () => {
           </div>
 
           {/* RIGHT: Situation Box */}
-          <div className="md:col-span-2 bg-white border rounded-xl shadow p-8 flex flex-col items-center justify-center min-h-[250px]">
+          <div className="md:col-span-2 bg-white border rounded-xl shadow p-8 flex flex-col items-center justify-center min-h-62.5">
             <div className="flex items-center gap-3 mb-4">
               <Clock className="w-8 h-8 text-red-600" />
               <span className="text-2xl font-bold text-red-600">

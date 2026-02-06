@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/lib/api";
+import api from "@/lib/api";
 
 const MAX_IMAGES = 12;
 
@@ -153,7 +153,7 @@ const TatAdd = () => {
                   placeholder="Model Story (optional)"
                   value={img.story}
                   onChange={(e) => updateImage(index, "story", e.target.value)}
-                  className="w-full border rounded-lg px-4 py-2 min-h-[120px]"
+                  className="w-full border rounded-lg px-4 py-2 min-h-30"
                 />
               </div>
             </div>
@@ -165,10 +165,9 @@ const TatAdd = () => {
               onClick={addImage}
               disabled={images.length >= MAX_IMAGES}
               className={`border px-6 py-2 rounded-lg font-medium transition
-                ${
-                  images.length >= MAX_IMAGES
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-muted"
+                ${images.length >= MAX_IMAGES
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-muted"
                 }
               `}
             >

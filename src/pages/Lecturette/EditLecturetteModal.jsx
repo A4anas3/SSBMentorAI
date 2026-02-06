@@ -37,7 +37,7 @@ const EditLecturetteModal = ({ open, onClose, lecturette }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl p-6 w-[750px] max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl p-6 w-187.5 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">✏️ Edit Lecturette</h2>
 
         {/* Title */}

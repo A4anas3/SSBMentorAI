@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useOirTestDetail } from "@/hooks/oir/useOir";
 import { deleteOir } from "@/features/oir/oirapi";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 import Header from "@/components/Header";
 import ConfirmAlert from "@/components/ConfirmAlert";
@@ -12,6 +12,9 @@ import ConfirmAlert from "@/components/ConfirmAlert";
 const TEST_DURATION = 20 * 60;
 
 const OirTestPage = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -60,6 +63,8 @@ const OirTestPage = () => {
   const questions = data.questions;
   const question = questions[currentQ];
 
+  /* ================= HELPERS ================= */
+
   const formatTime = () => {
     const min = Math.floor(timeLeft / 60);
     const sec = timeLeft % 60;
@@ -77,6 +82,7 @@ const OirTestPage = () => {
 
   const handleSubmit = () => {
     let correct = 0;
+
     questions.forEach((q) => {
       if (answers[q.questionId] === q.correctOption) correct++;
     });
@@ -101,7 +107,8 @@ const OirTestPage = () => {
         <div className="flex items-center gap-4">
           <span className="font-bold text-red-600">⏱ {formatTime()}</span>
 
-          {IS_ADMIN && (
+          {/* ✅ ADMIN CONTROLS */}
+          {isUserAdmin && (
             <>
               <button
                 onClick={() => navigate(`/oir/admin/edit/${id}`)}
@@ -254,13 +261,15 @@ const OirTestPage = () => {
       )}
 
       {/* ================= DELETE CONFIRM ALERT ================= */}
-      <ConfirmAlert
-        show={showDeleteConfirm}
-        title="Delete OIR Test"
-        message="This will permanently delete the test and all its questions."
-        onCancel={() => setShowDeleteConfirm(false)}
-        onConfirm={() => deleteMutation.mutate(id)}
-      />
+      {isUserAdmin && (
+        <ConfirmAlert
+          show={showDeleteConfirm}
+          title="Delete OIR Test"
+          message="This will permanently delete the test and all its questions."
+          onCancel={() => setShowDeleteConfirm(false)}
+          onConfirm={() => deleteMutation.mutate(id)}
+        />
+      )}
     </>
   );
 };

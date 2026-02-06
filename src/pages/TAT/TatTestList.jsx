@@ -11,16 +11,21 @@ import { Brain } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const TatTestList = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const { data, isLoading, error } = useTatTestCards();
   const { deleteTat } = useTatAdmin();
   const navigate = useNavigate();
 
-  /* ✅ Alert State */
+  /* ================= ALERT STATE ================= */
   const [showAlert, setShowAlert] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
+  /* ================= HANDLERS ================= */
 
   const handleDeleteClick = (id) => {
     setSelectedId(id);
@@ -39,12 +44,31 @@ const TatTestList = () => {
     setSelectedId(null);
   };
 
-  if (isLoading) return <p className="text-center mt-20">Loading...</p>;
+  /* ================= STATES ================= */
 
-  if (error)
+  if (isLoading) {
     return (
-      <p className="text-center mt-20 text-red-500">Error loading TAT tests</p>
+      <section className="py-16 pt-24 bg-background">
+        <Header />
+        <p className="text-center mt-20 text-muted-foreground">
+          Loading TAT tests...
+        </p>
+      </section>
     );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 pt-24 bg-background">
+        <Header />
+        <p className="text-center mt-20 text-red-500">
+          Error loading TAT tests
+        </p>
+      </section>
+    );
+  }
+
+  /* ================= UI ================= */
 
   return (
     <section className="py-16 pt-24 bg-background">
@@ -71,7 +95,7 @@ const TatTestList = () => {
               href={`/tat/test/${test.id}`}
               size="small"
               /* ✅ Admin Controls (DELETE ONLY) */
-              showDelete={IS_ADMIN}
+              showDelete={isUserAdmin}
               onDelete={() => handleDeleteClick(test.id)}
             />
           ))}

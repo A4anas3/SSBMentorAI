@@ -6,7 +6,7 @@ import {
   useToggleSamplePPDTImage,
 } from "@/hooks/usePPDTAdmin";
 import { Trash2, Star, StarOff, Check, X } from "lucide-react";
-import { IS_ADMIN } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 /* ================= LOADING SPINNER ================= */
 const LoadingSpinner = () => (
@@ -18,7 +18,7 @@ const LoadingSpinner = () => (
   </div>
 );
 
-/* ================= SECTION COMPONENT ================= */
+/* ================= SECTION (PURE UI) ================= */
 const Section = ({ title, children, highlight, success }) => {
   let bg = "";
   if (highlight) bg = "bg-yellow-50";
@@ -34,6 +34,9 @@ const Section = ({ title, children, highlight, success }) => {
 
 /* ================= MAIN COMPONENT ================= */
 const SamplePPDT = () => {
+  // ✅ compute admin ONCE
+  const isUserAdmin = isAdmin();
+
   const { data, isLoading, isError } = useSamplePPDT();
   const deleteMutation = useDeletePPDTImage();
   const toggleMutation = useToggleSamplePPDTImage();
@@ -44,6 +47,7 @@ const SamplePPDT = () => {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
+  /* ================= STATES ================= */
   if (isLoading) {
     return (
       <section className="pt-24">
@@ -75,12 +79,14 @@ const SamplePPDT = () => {
     );
   }
 
+  /* ================= PAGINATION ================= */
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const paginatedData = data.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
 
+  /* ================= UI ================= */
   return (
     <section className="py-16 pt-24 bg-background">
       <Header />
@@ -96,21 +102,20 @@ const SamplePPDT = () => {
             className="mb-10 p-6 bg-white rounded-2xl shadow-md border border-gray-200 relative"
           >
             {/* ================= ADMIN ICONS ================= */}
-            {IS_ADMIN && (
+            {isUserAdmin && (
               <div className="absolute top-4 right-4 flex gap-2">
-                {/* TOGGLE */}
+                {/* TOGGLE SAMPLE */}
                 <button
                   onClick={() =>
                     setConfirmToggleId(
                       confirmToggleId === ppdt.id ? null : ppdt.id,
                     )
                   }
-                  className={`p-2 rounded-full border
-                    ${
-                      ppdt.isSample
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
+                  className={`p-2 rounded-full border ${
+                    ppdt.isSample
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
                 >
                   {ppdt.isSample ? <StarOff size={16} /> : <Star size={16} />}
                 </button>
@@ -133,7 +138,9 @@ const SamplePPDT = () => {
             {confirmToggleId === ppdt.id && (
               <div className="mb-4 p-3 rounded-lg bg-yellow-50 flex items-center justify-between text-sm">
                 <span>
-                  {ppdt.isSample ? "" : "Remove this image from samples?"}
+                  {ppdt.isSample
+                    ? "Remove this image from samples?"
+                    : "Add this image to samples?"}
                 </span>
                 <div className="flex gap-2">
                   <button
@@ -218,18 +225,17 @@ const SamplePPDT = () => {
           </div>
         ))}
 
-        {/* PAGINATION */}
+        {/* ================= PAGINATION ================= */}
         <div className="flex justify-center mt-10 gap-2 flex-wrap">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border
-                ${
-                  currentPage === i + 1
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-50 hover:bg-yellow-500"
-                }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border ${
+                currentPage === i + 1
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-50 hover:bg-yellow-500"
+              }`}
             >
               {i + 1}
             </button>
