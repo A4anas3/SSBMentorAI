@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { useGpeDetail } from "@/hooks/gpe/useGpe";
+import { toSecureUrl } from "@/lib/utils";
 
 const GpeTestAttempt = () => {
   const { id } = useParams();
@@ -46,7 +47,7 @@ const GpeTestAttempt = () => {
         {/* 🖼 GPE Image */}
         <div className="border rounded-xl overflow-hidden bg-white">
           <img
-            src={gpe.imageUrl}
+            src={toSecureUrl(gpe.imageUrl)}
             alt="GPE Model"
             className="w-full object-contain"
           />

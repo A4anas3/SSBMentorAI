@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { toSecureUrl } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Clock } from "lucide-react";
@@ -90,7 +91,7 @@ const PPDTTest = () => {
               {/* IMAGE PHASE (BLURRED) */}
               {phase === "IMAGE" && (
                 <img
-                  src={image.imageUrl}
+                  src={toSecureUrl(image.imageUrl)}
                   alt="PPDT"
                   className="max-h-95 w-auto object-contain 
                              blur-[1.5px] contrast-90 brightness-95"

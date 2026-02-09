@@ -6,7 +6,12 @@ export const useGpeAdmin = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: createGpe,
+    mutationFn: ({ gpe, image }) => {
+      const formData = new FormData();
+      formData.append("gpe", new Blob([JSON.stringify(gpe)], { type: "application/json" }));
+      if (image) formData.append("image", image);
+      return createGpe(formData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(GPE_KEYS.sample);
       queryClient.invalidateQueries(GPE_KEYS.test);
@@ -22,7 +27,12 @@ export const useGpeAdmin = () => {
   });
 
   const patchMutation = useMutation({
-    mutationFn: ({ id, payload }) => patchGpe(id, payload),
+    mutationFn: ({ id, gpe, image }) => {
+      const formData = new FormData();
+      formData.append("gpe", new Blob([JSON.stringify(gpe)], { type: "application/json" }));
+      if (image) formData.append("image", image);
+      return patchGpe(id, formData);
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries(GPE_KEYS.sample);
       queryClient.invalidateQueries(GPE_KEYS.detail(variables.id));

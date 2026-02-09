@@ -4,7 +4,8 @@ import Header from "@/components/Header.jsx";
 import SectionTitle from "@/components/SectionTitle.jsx";
 import { useGpeDetail } from "@/hooks/gpe/useGpe";
 import { useGpeAdmin } from "@/hooks/gpe/useGpeAdmin";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
+import { toSecureUrl } from "@/lib/utils";
 
 const EditGpePage = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const EditGpePage = () => {
   const { patchGpe, isUpdating } = useGpeAdmin(); // ✅ correct hook
 
   const [form, setForm] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   // ✅ Load existing data
   useEffect(() => {
@@ -75,7 +77,8 @@ const EditGpePage = () => {
     try {
       await patchGpe({
         id,
-        payload: form, // ✅ must be payload
+        gpe: form,
+        image: imageFile,
       });
 
       navigate("/gpe/test");
@@ -92,12 +95,23 @@ const EditGpePage = () => {
         <SectionTitle title="Edit GPE" centered />
 
         <div className="bg-card border border-sky-border rounded-xl p-6 space-y-3">
-          <input
-            className="w-full border p-2 rounded"
-            placeholder="Image URL"
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          />
+          {/* Show existing image URL if available */}
+          {form.imageUrl && (
+            <div className="mb-2">
+              <p className="text-sm text-gray-500 mb-1">Current Image:</p>
+              <img src={toSecureUrl(form.imageUrl)} alt="Current GPE" className="h-32 object-cover rounded" />
+            </div>
+          )}
+
+          <div className="border p-2 rounded flex items-center gap-3 bg-gray-50/50">
+            <Upload size={18} className="text-gray-500" />
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              onChange={(e) => setImageFile(e.target.files[0])}
+            />
+          </div>
 
           <textarea
             className="w-full border p-2 rounded"
@@ -190,7 +204,8 @@ const EditGpePage = () => {
             <button
               onClick={handleUpdate}
               disabled={isUpdating}
-              className="px-5 py-2 bg-green-600 text-white rounded"
+              className={`px-5 py-2 bg-green-600 text-white rounded ${isUpdating ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               {isUpdating ? "Updating..." : "Update GPE"}
             </button>

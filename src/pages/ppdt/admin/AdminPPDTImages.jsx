@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { toSecureUrl } from "@/lib/utils";
 import { useAdminPPDTImages, useDeletePPDTImage } from "@/hooks/usePPDTAdmin";
 
 const AdminPPDTImages = () => {
@@ -17,7 +18,7 @@ const AdminPPDTImages = () => {
         <div className="grid grid-cols-3 gap-6">
           {data.map((img) => (
             <div key={img.id} className="border rounded-lg p-3 shadow-sm">
-              <img src={img.imageUrl} alt="PPDT" className="rounded mb-2" />
+              <img src={toSecureUrl(img.imageUrl)} alt="PPDT" className="rounded mb-2" />
 
               <p className="text-sm text-gray-700 mb-2">{img.imageContext}</p>
 

@@ -2,11 +2,11 @@ import { useState } from "react";
 import Header from "@/components/Header.jsx";
 import SectionTitle from "@/components/SectionTitle.jsx";
 import { useGpeAdmin } from "@/hooks/gpe/useGpeAdmin";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AddGpeModel = () => {
-  const { createGpe } = useGpeAdmin();
+  const { createGpe, isCreating } = useGpeAdmin();
   const navigate = useNavigate();
 
   const initialForm = {
@@ -19,6 +19,7 @@ const AddGpeModel = () => {
   };
 
   const [form, setForm] = useState(initialForm);
+  const [imageFile, setImageFile] = useState(null);
 
   // ✅ Add Plan
   const addPlan = () => {
@@ -66,7 +67,7 @@ const AddGpeModel = () => {
   // ✅ Submit
   const handleSubmit = async () => {
     try {
-      await createGpe(form);
+      await createGpe({ gpe: form, image: imageFile });
       navigate("/gpe/sample"); // redirect after save
     } catch (err) {
       console.error("Error creating GPE:", err);
@@ -103,12 +104,16 @@ const AddGpeModel = () => {
           />
 
           {/* ✅ Image URL */}
-          <input
-            placeholder="Image URL"
-            className="w-full border p-2 rounded"
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          />
+          {/* ✅ Image File */}
+          <div className="border p-2 rounded flex items-center gap-3 bg-gray-50/50">
+            <Upload size={18} className="text-gray-500" />
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              onChange={(e) => setImageFile(e.target.files[0])}
+            />
+          </div>
 
           {/* ✅ Sample Toggle */}
           <div className="flex items-center gap-2 mt-2">
@@ -190,9 +195,11 @@ const AddGpeModel = () => {
             </button>
             <button
               onClick={handleSubmit}
-              className="px-5 py-2 bg-green-600 text-white rounded"
+              disabled={isCreating}
+              className={`px-5 py-2 bg-green-600 text-white rounded ${isCreating ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
-              Save GPE
+              {isCreating ? "Saving..." : "Save GPE"}
             </button>
           </div>
         </div>

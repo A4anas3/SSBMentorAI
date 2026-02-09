@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import { useParams, useNavigate } from "react-router-dom";
+import { toSecureUrl } from "@/lib/utils";
 import { useTatTestDetail } from "@/hooks/tat/useTat";
 import { useEffect, useState } from "react";
 
@@ -106,7 +107,7 @@ const TatTestAttempt = () => {
                 {/* IMAGE PHASE */}
                 {phase === "IMAGE" && (
                   <img
-                    src={image.imageUrl}
+                    src={toSecureUrl(image.imageUrl)}
                     alt="TAT"
                     className="max-h-105 w-auto object-contain"
                   />

@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { toSecureUrl } from "@/lib/utils";
 import { useLecturetteById } from "@/hooks/lecturette/useLecturettes";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Header from "@/components/Header";
@@ -48,9 +49,9 @@ const LecturetteDetailPage = () => {
         {/* Image */}
         <div className="w-full mb-8">
           <img
-            src={data.imageUrl || "/lecturette-default.jpg"}
+            src={toSecureUrl(data.imageUrl) || "/lecturette-default.jpg"}
             alt={data.title}
-            className="w-full h-64 md:h-80 object-cover rounded-xl shadow-md"
+            className="w-full h-auto min-h-35 max-h-48 md:max-h-72 md:min-h-56 object-contain mx-auto rounded-xl shadow-md bg-gray-50"
           />
         </div>
 

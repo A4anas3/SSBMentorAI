@@ -15,7 +15,7 @@ const InterviewSection = () => {
               <img
                 src={piImage}
                 alt="Personal Interview"
-                className="w-full h-56 lg:h-72 object-cover opacity-80"
+                className="w-full h-40 lg:h-56 object-cover opacity-80"
               />
               <div className="absolute inset-0 bg-linear-to-t from-primary via-primary/50 to-transparent" />
 
@@ -35,7 +35,7 @@ const InterviewSection = () => {
                 for questions about your life, achievements, current affairs,
                 and aspirations to serve the nation.
               </p>
-              <div className="inline-flex items-center gap-2 text-accent font-medium">
+              <div className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-yellow-500 transition-colors">
                 Start Practicing
                 <ChevronRight size={18} />
               </div>

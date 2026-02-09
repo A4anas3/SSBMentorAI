@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { toSecureUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Eye } from "lucide-react";
 import { isAdmin } from "@/config/admin";
@@ -51,11 +52,10 @@ const PPDTImageSelect = () => {
             return (
               <div
                 key={img.id}
-                className={`relative bg-white rounded-xl shadow transition ${
-                  canUserOpenTest
-                    ? "cursor-pointer hover:shadow-lg"
-                    : "cursor-default"
-                }`}
+                className={`relative bg-white rounded-xl shadow transition ${canUserOpenTest
+                  ? "cursor-pointer hover:shadow-lg"
+                  : "cursor-default"
+                  }`}
                 onClick={() => {
                   if (canUserOpenTest) {
                     navigate(`/practice/ppdt/test/${img.id}`);
@@ -77,16 +77,25 @@ const PPDTImageSelect = () => {
 
                 {/* IMAGE */}
                 <img
-                  src={img.imageUrl}
+                  src={toSecureUrl(img.imageUrl)}
                   alt="PPDT"
                   className="w-full h-36 object-cover rounded-t-xl"
                 />
 
                 {/* BODY */}
                 <div className="p-3">
-                  <p className="text-sm font-semibold text-center">
+                  <p className="text-sm font-semibold text-center mb-3">
                     Test {index + 1}
                   </p>
+
+                  {/* ✅ User Start Button */}
+                  {!isUserAdmin && (
+                    <div className="flex justify-center mb-1">
+                      <span className="inline-flex items-center px-4 py-1.5 rounded-lg text-xs font-bold shadow-md bg-yellow-400 text-black hover:bg-yellow-500 transition-colors">
+                        Start Test
+                      </span>
+                    </div>
+                  )}
 
                   {/* ADMIN CONTROLS */}
                   {isUserAdmin && (

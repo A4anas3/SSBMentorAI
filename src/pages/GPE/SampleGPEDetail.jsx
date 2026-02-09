@@ -3,6 +3,7 @@ import SectionTitle from "@/components/SectionTitle.jsx";
 import Header from "@/components/Header.jsx";
 import { useGpeDetail } from "@/hooks/gpe/useGpe";
 import { ArrowLeft } from "lucide-react";
+import { toSecureUrl } from "@/lib/utils";
 
 const SampleGPEDetail = () => {
   const { id } = useParams();
@@ -53,7 +54,7 @@ const SampleGPEDetail = () => {
         {/* 🖼️ GPE Image */}
         <div className="mb-8 rounded-xl overflow-hidden border border-sky-border shadow-sm">
           <img
-            src={gpe.imageUrl}
+            src={toSecureUrl(gpe.imageUrl)}
             alt="GPE Map"
             className="w-full object-cover"
           />

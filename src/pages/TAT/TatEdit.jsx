@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
+import { Upload } from "lucide-react";
+import { toSecureUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "@/lib/api";
@@ -7,6 +9,7 @@ import api from "@/lib/api";
 const emptyImage = {
   id: null, // 🔥 IMPORTANT
   imageUrl: "",
+  imageFile: null, // For new or replacement images
   imageContext: "",
   expectedTheme: "",
   story: "",
@@ -18,6 +21,7 @@ const TatEdit = () => {
 
   const [testName, setTestName] = useState("");
   const [images, setImages] = useState([]);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
@@ -48,6 +52,10 @@ const TatEdit = () => {
   };
 
   const removeImage = (index) => {
+    const img = images[index];
+    if (img.id) {
+      setDeletedImageIds((prev) => [...prev, img.id]);
+    }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -65,23 +73,46 @@ const TatEdit = () => {
       return;
     }
 
-    if (images.some((img) => !img.imageUrl.trim())) {
-      alert("Every picture must have an image URL");
+    // Validate: either has id/url OR has a file
+    if (images.some((img) => !img.id && !img.imageFile)) {
+      alert("New pictures must have a file uploaded.");
       return;
     }
 
     try {
       setLoading(true);
 
+      // 1. Update Test Name
       await api.patch(`/api/admin/tat/tests/${id}`, {
         testName,
-        images, // 🔥 ids preserved → backend PATCH works correctly
       });
+
+      // 2. Delete Removed Images
+      for (const delId of deletedImageIds) {
+        await api.delete(`/api/admin/tat/images/${delId}`);
+      }
+
+      // 3. Process Images (Update vs Create)
+      for (const img of images) {
+        const formData = new FormData();
+        if (img.imageFile) formData.append("image", img.imageFile);
+        formData.append("imageContext", img.imageContext || "");
+        formData.append("expectedTheme", img.expectedTheme || "");
+        formData.append("story", img.story || "");
+
+        if (img.id) {
+          // UPDATE EXISTING
+          await api.put(`/api/admin/tat/images/${img.id}`, formData);
+        } else {
+          // ADD NEW
+          await api.post(`/api/admin/tat/tests/${id}/image`, formData);
+        }
+      }
 
       navigate("/tat/sample");
     } catch (err) {
       console.error(err);
-      alert("Failed to update TAT test");
+      alert("Failed to update TAT test. Check console.");
     } finally {
       setLoading(false);
     }
@@ -131,14 +162,25 @@ const TatEdit = () => {
               </div>
 
               <div className="space-y-4">
-                <input
-                  placeholder="Image URL"
-                  value={img.imageUrl}
-                  onChange={(e) =>
-                    updateImage(index, "imageUrl", e.target.value)
-                  }
-                  className="w-full border rounded-lg px-4 py-2"
-                />
+                {/* Show current image if available */}
+                {img.imageUrl && (
+                  <div className="mb-2">
+                    <p className="text-xs text-muted-foreground mb-1">Current Image:</p>
+                    <img src={toSecureUrl(img.imageUrl)} alt="Current" className="h-20 object-contain rounded border" />
+                  </div>
+                )}
+
+                <div className="border p-2 rounded-lg flex items-center gap-3 bg-gray-50/50">
+                  <Upload size={18} className="text-gray-500" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      updateImage(index, "imageFile", e.target.files[0])
+                    }
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
 
                 <textarea
                   placeholder="Image Context (optional)"

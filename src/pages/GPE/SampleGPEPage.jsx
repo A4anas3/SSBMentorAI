@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toSecureUrl } from "@/lib/utils";
 import SectionTitle from "@/components/SectionTitle.jsx";
 import TestCard from "@/components/TestCard.jsx";
 import Header from "@/components/Header.jsx";
@@ -63,7 +64,7 @@ const SampleGPEPage = () => {
               key={gpe.id}
               title={`Test ${index + 1}`}
               description="Click to view full GPE scenario"
-              image={gpe.imageUrl}
+              image={toSecureUrl(gpe.imageUrl)}
               href={`/gpe/sample/${gpe.id}`}
               size="normal"
               variant="default"

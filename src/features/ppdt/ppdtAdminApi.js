@@ -11,6 +11,7 @@ export const fetchAllPPDTImagesAdmin = async () => {
 /* ======================
    ADMIN: ADD IMAGE
    ====================== */
+// payload is FormData
 export const addPPDTImage = async (payload) => {
   const { data } = await api.post("/admin/ppdt/image", payload);
   return data;

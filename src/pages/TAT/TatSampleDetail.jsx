@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import { toSecureUrl } from "@/lib/utils";
 import { useParams } from "react-router-dom";
 import { useTatSample } from "@/hooks/tat/useTat";
 import { useState } from "react";
@@ -28,24 +29,26 @@ const TatSampleDetail = () => {
       <main className="pt-24 min-h-screen bg-muted/30">
         <div className="container mx-auto px-4 grid grid-cols-12 gap-6">
           {/* 🔹 LEFT SIDE – Image List */}
-          <aside className="col-span-12 md:col-span-3 bg-background rounded-xl p-4 h-[80vh] overflow-y-auto shadow-sm">
+          <aside className="col-span-12 md:col-span-3 bg-background rounded-xl p-4 h-64 md:h-[80vh] overflow-y-auto shadow-sm">
             <h3 className="font-semibold mb-4 text-center">Pictures</h3>
 
             <div className="space-y-3">
               {images.map((img, index) => (
                 <button
-                  key={img.id}
+                  key={img.id || index}
                   onClick={() => setActiveIndex(index)}
-                  className={`w-full border rounded-lg overflow-hidden transition
-                    ${
-                      index === activeIndex
-                        ? "ring-2 ring-primary"
-                        : "hover:ring-1 hover:ring-primary/50"
+                  className={`w-full border rounded-lg overflow-hidden transition relative text-left
+                    ${index === activeIndex
+                      ? "ring-2 ring-primary"
+                      : "hover:ring-1 hover:ring-primary/50"
                     }
                   `}
                 >
+                  <div className="absolute top-0 left-0 bg-black/60 text-white text-xs px-2 py-1 rounded-br-lg font-medium backdrop-blur-sm z-10">
+                    #{index + 1}
+                  </div>
                   <img
-                    src={img.imageUrl}
+                    src={toSecureUrl(img.imageUrl)}
                     alt={`TAT ${index + 1}`}
                     className="w-full h-24 object-cover"
                   />
@@ -59,9 +62,9 @@ const TatSampleDetail = () => {
             <div className="bg-background rounded-xl shadow-sm overflow-hidden">
               {/* Image */}
               <img
-                src={activeImage.imageUrl}
+                src={toSecureUrl(activeImage.imageUrl)}
                 alt="TAT Sample"
-                className="w-full h-90 object-cover"
+                className="w-full h-auto max-h-64 md:max-h-[500px] object-contain mx-auto bg-gray-50"
               />
 
               {/* Content */}

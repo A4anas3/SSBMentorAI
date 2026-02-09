@@ -1,14 +1,14 @@
 import Header from "@/components/Header";
 import { useState } from "react";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, Upload } from "lucide-react";
 import { useAddPPDTImage } from "@/hooks/usePPDTAdmin";
 
 const AddPPDTImage = () => {
   const [form, setForm] = useState({
-    imageUrl: "",
     imageContext: "",
     guide: "",
   });
+  const [imageFile, setImageFile] = useState(null);
 
   const [alert, setAlert] = useState({
     type: "", // "success" | "error"
@@ -23,7 +23,7 @@ const AddPPDTImage = () => {
 
   const handleSubmit = () => {
     // frontend validation
-    if (!form.imageUrl || !form.imageContext || !form.guide) {
+    if (!imageFile || !form.imageContext || !form.guide) {
       setAlert({
         type: "error",
         message: "All fields are required ❌",
@@ -32,7 +32,12 @@ const AddPPDTImage = () => {
       return;
     }
 
-    addMutation.mutate(form, {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("imageContext", form.imageContext);
+    formData.append("guide", form.guide);
+
+    addMutation.mutate(formData, {
       onSuccess: () => {
         setAlert({
           type: "success",
@@ -40,10 +45,10 @@ const AddPPDTImage = () => {
         });
 
         setForm({
-          imageUrl: "",
           imageContext: "",
           guide: "",
         });
+        setImageFile(null);
 
         setTimeout(closeAlert, 3000);
       },
@@ -107,18 +112,20 @@ const AddPPDTImage = () => {
             </div>
           </div>
 
-          {/* IMAGE URL */}
+          {/* IMAGE FILE */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL
+              Upload Image
             </label>
-            <input
-              type="text"
-              placeholder="https://example.com/image.png"
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={form.imageUrl}
-              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            />
+            <div className="border p-2 rounded-lg flex items-center gap-3 bg-gray-50/50">
+              <Upload size={18} className="text-gray-500" />
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                onChange={(e) => setImageFile(e.target.files[0])}
+              />
+            </div>
           </div>
 
           {/* IMAGE CONTEXT */}

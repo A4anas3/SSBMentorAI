@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toSecureUrl } from "@/lib/utils";
 import Header from "@/components/Header";
 import { useSamplePPDT } from "@/hooks/useSamplePPDT";
 import {
@@ -111,11 +112,10 @@ const SamplePPDT = () => {
                       confirmToggleId === ppdt.id ? null : ppdt.id,
                     )
                   }
-                  className={`p-2 rounded-full border ${
-                    ppdt.isSample
+                  className={`p-2 rounded-full border ${ppdt.isSample
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-green-100 text-green-700"
-                  }`}
+                    }`}
                 >
                   {ppdt.isSample ? <StarOff size={16} /> : <Star size={16} />}
                 </button>
@@ -150,9 +150,9 @@ const SamplePPDT = () => {
                         ...(ppdt.isSample
                           ? {}
                           : {
-                              action: "sample",
-                              sampleStory: ppdt.sampleStory,
-                            }),
+                            action: "sample",
+                            sampleStory: ppdt.sampleStory,
+                          }),
                       });
                       setConfirmToggleId(null);
                     }}
@@ -200,7 +200,7 @@ const SamplePPDT = () => {
 
             <div className="flex justify-center mb-5">
               <img
-                src={ppdt.imageUrl}
+                src={toSecureUrl(ppdt.imageUrl)}
                 alt="PPDT"
                 className="w-full max-w-sm rounded-xl"
               />
@@ -231,11 +231,10 @@ const SamplePPDT = () => {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border ${
-                currentPage === i + 1
+              className={`px-4 py-2 rounded-lg text-sm font-medium border ${currentPage === i + 1
                   ? "bg-green-500 text-white"
                   : "bg-gray-50 hover:bg-yellow-500"
-              }`}
+                }`}
             >
               {i + 1}
             </button>

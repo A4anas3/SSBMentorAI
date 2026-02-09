@@ -1,13 +1,15 @@
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
+import { Upload } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 
 const MAX_IMAGES = 12;
 
+
 const emptyImage = {
-  imageUrl: "",
+  imageFile: null, // ✅ Changed from imageUrl
   imageContext: "",
   expectedTheme: "",
   story: "",
@@ -50,23 +52,37 @@ const TatAdd = () => {
       return;
     }
 
-    if (images.some((img) => !img.imageUrl.trim())) {
-      alert("All 12 pictures must have an Image URL.");
+    // validate all have files
+    if (images.some((img) => !img.imageFile)) {
+      alert("All 12 pictures must have an image file uploaded.");
       return;
     }
 
     try {
       setLoading(true);
 
-      await api.post("/api/admin/tat/tests", {
+      // 1. Create Test Shell
+      const { data: testData } = await api.post("/api/admin/tat/tests", {
         testName,
-        images,
       });
+
+      const testId = testData.id;
+
+      // 2. Upload Images sequentially
+      for (const img of images) {
+        const formData = new FormData();
+        formData.append("image", img.imageFile);
+        formData.append("imageContext", img.imageContext || "");
+        formData.append("expectedTheme", img.expectedTheme || "");
+        formData.append("story", img.story || "");
+
+        await api.post(`/api/admin/tat/tests/${testId}/image`, formData);
+      }
 
       navigate("/tat/sample");
     } catch (err) {
       console.error(err);
-      alert("Failed to create TAT test");
+      alert("Failed to create TAT test. Check console.");
     } finally {
       setLoading(false);
     }
@@ -120,15 +136,17 @@ const TatAdd = () => {
               </div>
 
               <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Image URL (required)"
-                  value={img.imageUrl}
-                  onChange={(e) =>
-                    updateImage(index, "imageUrl", e.target.value)
-                  }
-                  className="w-full border rounded-lg px-4 py-2"
-                />
+                <div className="border p-2 rounded-lg flex items-center gap-3 bg-gray-50/50">
+                  <Upload size={18} className="text-gray-500" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      updateImage(index, "imageFile", e.target.files[0])
+                    }
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
 
                 <textarea
                   placeholder="Image Context (optional)"

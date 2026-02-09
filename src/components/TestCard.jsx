@@ -23,8 +23,8 @@ const TestCard = ({
   const isNavy = variant === "navy";
 
   // ✅ Dynamic styles based on size
-  const imageHeight = size === "small" ? "h-32" : "h-48";
-  const padding = size === "small" ? "p-4" : "p-6";
+  const imageHeight = size === "small" ? "h-28" : "h-40";
+  const padding = size === "small" ? "p-3" : "p-5";
   const titleSize = size === "small" ? "text-lg" : "text-xl";
   const descSize = size === "small" ? "text-xs" : "text-sm";
 
@@ -60,11 +60,10 @@ const TestCard = ({
 
       <Link
         to={href}
-        className={`block rounded-xl overflow-hidden card-hover cursor-pointer transition-all duration-200 ${
-          isNavy
-            ? "bg-primary text-primary-foreground"
-            : "bg-card border border-sky-border hover:shadow-lg"
-        }`}
+        className={`block rounded-xl overflow-hidden card-hover cursor-pointer transition-all duration-200 ${isNavy
+          ? "bg-primary text-primary-foreground"
+          : "bg-card border border-sky-border hover:shadow-lg"
+          }`}
       >
         {/* ✅ Image */}
         <div className="relative overflow-hidden sky-overlay">
@@ -77,9 +76,8 @@ const TestCard = ({
           {/* ✅ Optional Icon */}
           {Icon && (
             <div
-              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center ${
-                isNavy ? "bg-accent" : "bg-accent/90"
-              }`}
+              className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center ${isNavy ? "bg-accent" : "bg-accent/90"
+                }`}
             >
               <Icon size={18} className="text-primary" />
             </div>
@@ -89,20 +87,30 @@ const TestCard = ({
         {/* ✅ Content */}
         <div className={padding}>
           <h3
-            className={`${titleSize} font-display font-semibold mb-1 ${
-              isNavy ? "text-primary-foreground" : "text-primary"
-            }`}
+            className={`${titleSize} font-display font-semibold mb-1 ${isNavy ? "text-primary-foreground" : "text-primary"
+              }`}
           >
             {title}
           </h3>
 
           <p
-            className={`${descSize} leading-relaxed ${
-              isNavy ? "text-primary-foreground/80" : "text-muted-foreground"
-            }`}
+            className={`${descSize} leading-relaxed ${isNavy ? "text-primary-foreground/80" : "text-muted-foreground"
+              }`}
           >
             {description}
           </p>
+
+          {/* ✅ Action Button */}
+          <div className="mt-4">
+            <span
+              className={`inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition-colors ${isNavy
+                ? "bg-white text-primary hover:bg-white/90"
+                : "bg-yellow-400 text-black hover:bg-yellow-500 shadow-md"
+                }`}
+            >
+              Click Here
+            </span>
+          </div>
         </div>
       </Link>
     </div>
