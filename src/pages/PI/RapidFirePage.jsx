@@ -4,12 +4,12 @@ import { useRapidFire } from "@/hooks/interview/useRapidFire";
 import { useRapidFireAdmin } from "@/hooks/interview/useRapidFire";
 import { ChevronDown, Plus, Trash2, Pencil } from "lucide-react";
 import { useState } from "react";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 import { useNavigate } from "react-router-dom";
 
 const RapidFirePage = () => {
   // ✅ compute admin ONCE
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const navigate = useNavigate();
   const { data, isLoading, error } = useRapidFire();

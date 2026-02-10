@@ -7,7 +7,7 @@ import {
   useToggleSamplePPDTImage,
 } from "@/hooks/usePPDTAdmin";
 import { Trash2, Star, StarOff, Check, X } from "lucide-react";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 
 /* ================= LOADING SPINNER ================= */
 const LoadingSpinner = () => (
@@ -36,7 +36,7 @@ const Section = ({ title, children, highlight, success }) => {
 /* ================= MAIN COMPONENT ================= */
 const SamplePPDT = () => {
   // ✅ compute admin ONCE
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const { data, isLoading, isError } = useSamplePPDT();
   const deleteMutation = useDeletePPDTImage();
@@ -113,8 +113,8 @@ const SamplePPDT = () => {
                     )
                   }
                   className={`p-2 rounded-full border ${ppdt.isSample
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-green-100 text-green-700"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
                     }`}
                 >
                   {ppdt.isSample ? <StarOff size={16} /> : <Star size={16} />}
@@ -232,8 +232,8 @@ const SamplePPDT = () => {
               key={i}
               onClick={() => setCurrentPage(i + 1)}
               className={`px-4 py-2 rounded-lg text-sm font-medium border ${currentPage === i + 1
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-50 hover:bg-yellow-500"
+                ? "bg-green-500 text-white"
+                : "bg-gray-50 hover:bg-yellow-500"
                 }`}
             >
               {i + 1}

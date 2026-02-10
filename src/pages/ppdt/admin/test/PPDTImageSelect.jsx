@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { toSecureUrl } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Eye } from "lucide-react";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 import {
   useDeletePPDTImage,
   useToggleSamplePPDTImage,
@@ -13,7 +13,7 @@ import { useState } from "react";
 
 const PPDTImageSelect = () => {
   // ✅ compute admin ONCE
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const { data: images = [], isLoading } = usePPDTTestImages();
   const navigate = useNavigate();

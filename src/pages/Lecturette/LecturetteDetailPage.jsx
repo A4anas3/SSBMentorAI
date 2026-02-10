@@ -6,10 +6,10 @@ import Header from "@/components/Header";
 import { useState } from "react";
 import EditLecturetteModal from "@/pages/Lecturette/EditLecturetteModal";
 import { Pencil } from "lucide-react";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 
 const LecturetteDetailPage = () => {
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const [openEdit, setOpenEdit] = useState(false);
 

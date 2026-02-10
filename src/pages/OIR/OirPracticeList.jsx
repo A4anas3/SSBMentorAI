@@ -1,11 +1,12 @@
 import Header from "@/components/Header";
+import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import TestCard from "@/components/TestCard";
 import ConfirmAlert from "@/components/ConfirmAlert";
 
 import { useOirTestNames } from "@/hooks/oir/useOir";
 import { deleteOir } from "@/features/oir/oirapi";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 
 import oirImage from "@/assets/card-oir.jpg";
 import { Brain, Clock, AlertTriangle } from "lucide-react";
@@ -15,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 const OirPracticeList = () => {
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const { data, isLoading, error } = useOirTestNames();
   const navigate = useNavigate();

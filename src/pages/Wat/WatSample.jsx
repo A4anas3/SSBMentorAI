@@ -8,11 +8,11 @@ import watImage from "@/assets/card-wat.jpg";
 import { BookOpen, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { isAdmin } from "@/config/admin";
+import { useAdmin } from "@/config/admin";
 
 const WatSample = () => {
   // ✅ compute admin ONCE
-  const isUserAdmin = isAdmin();
+  const { isAdmin: isUserAdmin } = useAdmin();
 
   const { data, isLoading, error } = useWatTestNames();
   const { deleteWat } = useWatAdmin();
