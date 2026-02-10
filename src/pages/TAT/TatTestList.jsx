@@ -11,11 +11,11 @@ import { Brain } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const TatTestList = () => {
   // ✅ compute admin ONCE
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   const { data, isLoading, error } = useTatTestCards();
   const { deleteTat } = useTatAdmin();

@@ -7,40 +7,17 @@ import { getAccessToken } from "@/lib/authApi";
  * Client-side role checks can be bypassed. Always verify permissions on the backend.
  * Never use this to protect sensitive data or operations.
  */
-import { useState, useEffect } from 'react';
+export const isAdmin = () => {
+  const token = getAccessToken();
+  if (!token) return false;
 
-/**
- * Check if current user has ADMIN role (Hook)
- * 
- * ⚠️ SECURITY WARNING: This is for UI/UX purposes only!
- * Client-side role checks can be bypassed. Always verify permissions on the backend.
- * Never use this to protect sensitive data or operations.
- */
-export const useAdmin = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkRole = async () => {
-      try {
-        const token = await getAccessToken();
-        if (!token) {
-          setIsAdmin(false);
-          return;
-        }
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setIsAdmin(payload.realm_access?.roles?.includes("ADMIN") || false);
-      } catch (error) {
-        console.warn("Failed to check admin role:", error);
-        setIsAdmin(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkRole();
-  }, []);
-
-  return { isAdmin, loading };
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.realm_access?.roles?.includes("ADMIN") || false;
+  } catch (error) {
+    console.warn("Failed to check admin role:", error);
+    return false;
+  }
 };
 
 /**
@@ -48,29 +25,15 @@ export const useAdmin = () => {
  * 
  * ⚠️ SECURITY WARNING: Client-side role retrieval is for display purposes only.
  */
-export const useUserRoles = () => {
-  const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(true);
+export const getUserRoles = () => {
+  const token = getAccessToken();
+  if (!token) return [];
 
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const token = await getAccessToken();
-        if (!token) {
-          setRoles([]);
-          return;
-        }
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setRoles(payload.realm_access?.roles || []);
-      } catch (error) {
-        console.warn("Failed to get user roles:", error);
-        setRoles([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRoles();
-  }, []);
-
-  return { roles, loading };
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.realm_access?.roles || [];
+  } catch (error) {
+    console.warn("Failed to get user roles:", error);
+    return [];
+  }
 };

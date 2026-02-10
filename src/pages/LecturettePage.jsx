@@ -11,12 +11,12 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Plus } from "lucide-react";
 import { useLecturetteAdmin } from "@/hooks/lecturette/useLecturetteAdmin";
 import AddLecturetteModal from "@/pages/Lecturette/AddLecturetteModal";
-import { useAdmin } from "@/config/admin"; // ✅ IMPORT ADMIN HOOK
+import { isAdmin } from "@/config/admin"; // ✅ IMPORT ADMIN FLAG
 
 const categories = ["All", "Defence", "Social", "Education", "Technology"];
 
 const LecturettePage = () => {
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   const { toast } = useToast();
   const { data, isLoading, refetch } = useLecturettes();

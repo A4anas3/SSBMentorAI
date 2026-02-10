@@ -14,7 +14,7 @@ import img2 from "@/assets/card-ppdt.jpg";
 import img3 from "@/assets/Sampleppdt.png";
 import adminAddImg from "@/assets/Sampleppdt.png";
 import adminAllImg from "@/assets/Sampleppdt.png";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const ppdtPractice = [
   {
@@ -70,7 +70,7 @@ const adminCards = [
 ];
 
 const PPDTPractice = () => {
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
   const cards = isUserAdmin ? [...ppdtPractice, ...adminCards] : ppdtPractice;
 
   return (

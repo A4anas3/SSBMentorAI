@@ -3,11 +3,11 @@ import TestCard from "@/components/TestCard.jsx";
 import { Target, BookOpen, PlayCircle, PlusCircle } from "lucide-react";
 import gpeImage from "@/assets/card-gpe.jpg";
 import Header from "../../components/Header";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const GPEPage = () => {
   // ✅ compute admin ONCE (inside component)
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   // ✅ base cards (no auth logic here)
   const gpeCards = [

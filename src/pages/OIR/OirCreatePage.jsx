@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import { createOir } from "@/features/oir/oirapi";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 import { getErrorMessage } from "@/lib/utils";
 
 const emptyQuestion = {
@@ -19,7 +19,7 @@ const emptyQuestion = {
 
 const OirCreatePage = () => {
   const navigate = useNavigate();
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   if (!isUserAdmin) {
     return <p className="mt-20 text-center">Unauthorized</p>;

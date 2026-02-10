@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Info, Brain, PlusCircle } from "lucide-react";
 import oirImage from "@/assets/card-oir.jpg";
 
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const oirCards = [
   {
@@ -28,7 +28,7 @@ const oirCards = [
 ];
 
 const OirPage = () => {
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   return (
     <>

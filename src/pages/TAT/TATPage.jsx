@@ -9,11 +9,11 @@ import aboutImg from "@/assets/card-tat.jpg";
 import sampleImg from "@/assets/card-tat.jpg";
 import testImg from "@/assets/card-tat.jpg";
 
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const TATPage = () => {
   // ✅ compute admin ONCE
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   // ✅ base cards (no auth logic here)
   const tatCards = [

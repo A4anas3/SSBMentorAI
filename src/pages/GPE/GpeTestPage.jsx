@@ -5,12 +5,12 @@ import Header from "@/components/Header.jsx";
 import TestCard from "@/components/TestCard.jsx";
 import { useGpeTest } from "@/hooks/gpe/useGPE";
 import { useGpeAdmin } from "@/hooks/gpe/useGpeAdmin";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 import { useNavigate } from "react-router-dom";
 
 const GpeTestPage = () => {
   // ✅ compute admin ONCE
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   const navigate = useNavigate();
   const { data: testList, isLoading, error } = useGpeTest();

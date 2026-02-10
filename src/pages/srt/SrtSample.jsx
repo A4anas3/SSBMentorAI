@@ -8,11 +8,11 @@ import srtImage from "@/assets/card-srt.jpg";
 import { BookOpen, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAdmin } from "@/config/admin";
+import { isAdmin } from "@/config/admin";
 
 const SrtSample = () => {
   // ✅ compute admin ONCE
-  const { isAdmin: isUserAdmin } = useAdmin();
+  const isUserAdmin = isAdmin();
 
   const { data, isLoading, error } = useSrtTestNames();
   const { deleteSrt } = useSrtAdmin();
