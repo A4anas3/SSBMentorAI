@@ -23,19 +23,14 @@ export default function VerifySuccess() {
                 </p>
 
                 <div className="space-y-4">
-                    <button
-                        onClick={() => navigate("/login")}
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-accent/25 flex items-center justify-center gap-2"
-                    >
-                        Go to Login
-                    </button>
+
 
                     <button
                         onClick={() => navigate("/")}
                         className="w-full bg-secondary/50 hover:bg-secondary text-secondary-foreground font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
                     >
                         <Home size={18} />
-                        Go to Home
+                        Go to Website
                     </button>
                 </div>
             </div>
