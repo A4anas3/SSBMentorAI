@@ -3,7 +3,6 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
-import { login, signup } from "@/lib/authApi";
 
 const navLinks = [
   { name: "Home", type: "route", to: "/" },
@@ -21,6 +20,10 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
+
+  const openAuthModal = () => {
+    window.dispatchEvent(new Event("auth:unauthorized"));
+  };
 
   const scrollToSection = (sectionId) => {
     const el = document.getElementById(sectionId);
@@ -85,11 +88,11 @@ const Header = () => {
           <div className="hidden lg:flex items-center gap-3">
             {!isAuthenticated ? (
               <>
-                <Button variant="ghost" size="sm" onClick={login}>
+                <Button variant="ghost" size="sm" onClick={openAuthModal}>
                   Login
                 </Button>
 
-                <Button variant="accent" size="sm" onClick={signup}>
+                <Button variant="accent" size="sm" onClick={openAuthModal}>
                   Sign Up
                 </Button>
               </>
@@ -151,12 +154,12 @@ const Header = () => {
                   <Button
                     variant="ghost"
                     className="mt-4 w-full"
-                    onClick={login}
+                    onClick={openAuthModal}
                   >
                     Login
                   </Button>
 
-                  <Button variant="accent" className="w-full" onClick={signup}>
+                  <Button variant="accent" className="w-full" onClick={openAuthModal}>
                     Sign Up
                   </Button>
                 </>
