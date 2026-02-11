@@ -29,7 +29,6 @@ const SignupForm = ({ onSuccess }) => {
             await signupWithPassword(email, password, fullName);
             setSuccessMessage(true);
             toast.success("Account created successfully!");
-            if (onSuccess) onSuccess();
         } catch (error) {
             toast.error(error.message || "Failed to sign up");
         } finally {
@@ -70,6 +69,13 @@ const SignupForm = ({ onSuccess }) => {
                 <p className="text-xs text-gray-400 mt-4">
                     Didn't receive the email? Check your spam folder.
                 </p>
+                <Button
+                    onClick={onSuccess}
+                    variant="outline"
+                    className="w-full mt-4"
+                >
+                    Close
+                </Button>
             </div>
         );
     }
