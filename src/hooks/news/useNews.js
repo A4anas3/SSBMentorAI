@@ -12,7 +12,7 @@ export const useNews = () => {
       try {
         setLoading(true);
         const data = await fetchNews();
-        setNews(data.news);
+        setNews(data.news ?? []);        // ← only change
         setLastUpdated(data.last_updated);
       } catch (err) {
         setError("Failed to load news");
