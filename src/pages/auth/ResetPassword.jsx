@@ -12,13 +12,11 @@ export default function ResetPassword() {
     const navigate = useNavigate();
     const { toast } = useToast();
 
-    // 🔥 IMPORTANT for Supabase v2
+    // 🔥 IMPORTANT: create session from email link (Supabase v2)
     useEffect(() => {
         const handleRecovery = async () => {
-            const hash = window.location.hash;
-
-            if (hash && hash.includes("access_token")) {
-                const { error } = await supabase.auth.exchangeCodeForSession(
+            try {
+                const { data, error } = await supabase.auth.exchangeCodeForSession(
                     window.location.href
                 );
 
@@ -26,21 +24,26 @@ export default function ResetPassword() {
                     toast({
                         variant: "destructive",
                         title: "Link expired",
-                        description: "Reset link expired. Request again.",
+                        description: "Reset link expired. Please request again.",
                     });
+                } else {
+                    console.log("Recovery session created:", data);
                 }
+            } catch (err) {
+                console.error(err);
             }
         };
 
         handleRecovery();
     }, []);
 
+    // 🔐 Update password
     const handleUpdate = async () => {
         if (!password) {
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: "Enter new password",
+                description: "Please enter new password",
             });
             return;
         }
@@ -68,7 +71,7 @@ export default function ResetPassword() {
         }
     };
 
-    // ✅ SUCCESS SCREEN
+    // 🟢 SUCCESS SCREEN
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -89,10 +92,11 @@ export default function ResetPassword() {
 
                     <button
                         onClick={() => navigate("/")}
-                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-xl 
-                       shadow-lg shadow-yellow-400/40 hover:shadow-yellow-500/60"
+                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-xl 
+                       shadow-lg shadow-yellow-400/40 hover:shadow-yellow-500/60
+                       transition-all duration-300 flex items-center justify-center gap-2"
                     >
-                        <Home size={18} className="inline mr-2" />
+                        <Home size={18} />
                         Go to Website
                     </button>
                 </div>
@@ -100,7 +104,7 @@ export default function ResetPassword() {
         );
     }
 
-    // 🔐 FORM
+    // 🔐 FORM UI
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
             <div className="max-w-md w-full bg-card border p-8 rounded-2xl shadow-2xl text-center">
@@ -115,29 +119,32 @@ export default function ResetPassword() {
                 </h2>
 
                 <p className="mb-8 text-muted-foreground">
-                    Enter your new password
+                    Enter your new password below
                 </p>
 
-                <input
-                    type="password"
-                    placeholder="Enter new password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 rounded-xl border mb-4"
-                />
+                <div className="space-y-4 text-left">
+                    <input
+                        type="password"
+                        placeholder="Enter new password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-background border border-input focus:border-yellow-400 outline-none"
+                    />
 
-                <button
-                    onClick={handleUpdate}
-                    disabled={loading}
-                    className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 
-                     hover:from-yellow-500 hover:to-amber-600 
-                     text-black font-bold py-3 rounded-xl
-                     shadow-[0_0_25px_rgba(251,191,36,0.5)]
-                     hover:shadow-[0_0_35px_rgba(251,191,36,0.7)]
-                     transition-all duration-300"
-                >
-                    {loading ? "Updating..." : "Update Password"}
-                </button>
+                    <button
+                        onClick={handleUpdate}
+                        disabled={loading}
+                        className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 
+                       hover:from-yellow-500 hover:to-amber-600 
+                       text-black font-bold py-3 px-6 rounded-xl
+                       shadow-[0_0_25px_rgba(251,191,36,0.5)]
+                       hover:shadow-[0_0_35px_rgba(251,191,36,0.7)]
+                       transition-all duration-300
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? "Updating..." : "Update Password"}
+                    </button>
+                </div>
             </div>
         </div>
     );
