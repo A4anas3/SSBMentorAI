@@ -129,7 +129,7 @@ const App = () => {
                 <Routes>
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/verify-success" element={<VerifySuccess />} />
-                  <Route path="/update-password" element={<ResetPassword />} />
+                  <Route path="/auth/update-password" element={<ResetPassword />} />
 
                   <Route path="/" element={<Index />} />
                   <Route path="/practice/ppdt" element={<PPDTPractice />} />
