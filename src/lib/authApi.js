@@ -31,7 +31,7 @@ export const signupWithPassword = async (email, password, fullName) => {
     email,
     password,
     options: {
-      emailRedirectTo: REDIRECT_URI,
+      emailRedirectTo: `${window.location.origin}/verify-success`,
       data: {
         full_name: fullName,
       },

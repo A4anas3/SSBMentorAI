@@ -21,10 +21,7 @@ const AuthCallback = () => {
       }
 
 
-      if (type === "signup") {
-        navigate("/verify-success");
-        return;
-      }
+
 
       await supabase.auth.refreshSession();
 
