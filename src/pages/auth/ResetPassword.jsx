@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { Lock, CheckCircle, Home } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
