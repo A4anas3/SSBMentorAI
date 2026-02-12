@@ -1,25 +1,83 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const AuthCallback = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const handle = async () => {
+      // 1. Check for errors in URL
+      const params = new URLSearchParams(window.location.hash.substring(1)); // hash params
+      const errorDescription = params.get("error_description");
+      if (errorDescription) {
+        setError(errorDescription);
+        setTimeout(() => navigate("/auth"), 3000);
+        return;
+      }
+
+      // 2. Check for specific flow types
+      // Supabase sends type=recovery in the hash
+      const type = params.get("type");
+
+      if (type === "recovery") {
+        // Wait for session to be established
+        const { data, error } = await supabase.auth.getSession();
+        if (!error && data.session) {
+          navigate("/auth/update-password");
+          return;
+        }
+      }
+
+      if (type === "signup") {
+        navigate("/verify-success");
+        return;
+      }
+
+      // 3. Default fallback (e.g. valid OAuth login)
       const { data } = await supabase.auth.getSession();
-
-      const returnUrl = localStorage.getItem("return_url") || "/";
-      localStorage.removeItem("return_url");
-
       if (data.session) {
-        window.location.href = returnUrl;
+        const returnUrl = localStorage.getItem("return_url") || "/";
+        localStorage.removeItem("return_url");
+        navigate(returnUrl);
       } else {
-        window.location.href = "/";
+        // If we got here and no session, something failed
+        // Try exchange code if query param exists (for some flows)
+        const code = new URLSearchParams(window.location.search).get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!error) {
+            const returnUrl = localStorage.getItem("return_url") || "/";
+            localStorage.removeItem("return_url");
+            navigate(returnUrl);
+            return;
+          }
+        }
+        navigate("/");
       }
     };
 
     handle();
-  }, []);
+  }, [navigate]);
 
-  return <p>Signing you in...</p>;
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+        <p className="text-red-500 font-bold">Authentication Error</p>
+        <p className="text-muted-foreground">{error}</p>
+        <p className="text-sm">Redirecting...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <p className="text-muted-foreground">Verifying access...</p>
+    </div>
+  );
 };
 
 export default AuthCallback;
