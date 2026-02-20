@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Mic, Square, VideoOff, Timer } from "lucide-react";
 
-/**
- * Normalize string for comparison:
- * - lowercase
- * - strip punctuation
- * - collapse whitespace
- */
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+/** Normalize text for comparison: lowercase, no punctuation, collapsed whitespace */
 const normalize = (str) =>
     str
         .toLowerCase()
@@ -15,28 +14,34 @@ const normalize = (str) =>
         .trim();
 
 /**
- * Strip the already-confirmed portion from a new transcript.
- * Uses word-count based slicing on the original (preserving case/punctuation)
- * after confirming a match on the normalized version.
+ * Android Chrome bug: after SpeechRecognition restarts, the first onresult
+ * event replays ALL previously confirmed text as if it's new.
+ *
+ * Fix: At session start we snapshot `confirmedText`. On each onresult we strip
+ * that snapshot prefix using normalized word-count matching so punctuation /
+ * capitalization differences don't cause mismatches.
+ *
+ * Returns only the NEW words from `rawTranscript` beyond `snapshotText`.
  */
-const stripConfirmed = (confirmedText, newTranscript) => {
-    const normalizedConfirmed = normalize(confirmedText);
-    const normalizedNew = normalize(newTranscript);
+const stripSessionSnapshot = (snapshotText, rawTranscript) => {
+    const normSnapshot = normalize(snapshotText);
+    const normRaw = normalize(rawTranscript);
 
-    if (!normalizedConfirmed || !normalizedNew.startsWith(normalizedConfirmed)) {
-        return newTranscript; // no match, return as-is
+    // Nothing to strip, or no replay match — return as-is
+    if (!normSnapshot || !normRaw.startsWith(normSnapshot)) {
+        return rawTranscript.trim();
     }
 
-    // Count words in confirmed text, then slice that many from the new transcript
-    const confirmedWordCount = normalizedConfirmed.split(" ").filter(Boolean).length;
-    const newWords = newTranscript.trim().split(/\s+/);
-    return newWords.slice(confirmedWordCount).join(" ").trim();
+    const snapshotWordCount = normSnapshot.split(/\s+/).filter(Boolean).length;
+    const rawWords = rawTranscript.trim().split(/\s+/);
+
+    return rawWords.slice(snapshotWordCount).join(" ").trim();
 };
 
-/**
- * VoiceRecorder Component
- * Fixed: robust Android Chrome duplicate prevention using normalized word-based dedup
- */
+/* ============================================================
+   COMPONENT
+   ============================================================ */
+
 const VoiceRecorder = ({
     onRecordComplete,
     maxDuration = 60,
@@ -48,44 +53,42 @@ const VoiceRecorder = ({
     const [hasPermission, setHasPermission] = useState(null);
 
     const videoRef = useRef(null);
-    const recognitionRef = useRef(null);
-    const finalTextRef = useRef("");
-    const timerRef = useRef(null);
     const streamRef = useRef(null);
-    const startTimeRef = useRef(null);
-    const listeningRef = useRef(false);
+    const timerRef = useRef(null);
+    const recognitionRef = useRef(null);
 
-    /* ============================
-       Keep listening ref in sync
-    ============================ */
+    // ── Transcript refs (used inside closures — never stale) ──────────────────
+    const confirmedRef = useRef("");     // all text confirmed final across restarts
+    const snapshotRef = useRef("");     // snapshot of confirmedRef at each session start
+    const listeningRef = useRef(false);  // mirrors `listening` for onend closure
+    const startTimeRef = useRef(null);
+
+    /* ── Keep listeningRef in sync ── */
     useEffect(() => {
         listeningRef.current = listening;
     }, [listening]);
 
-    /* ============================
-       Init Media
-    ============================ */
+    /* ── Media init ── */
     useEffect(() => {
-        startMedia();
+        initMedia();
         return () => {
             stopStream();
-            stopRecordingProcess();
+            killRecognition();
         };
     }, [mode]);
 
-    const startMedia = async () => {
+    const initMedia = async () => {
         try {
-            const constraints = {
+            const stream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
                 video: mode === "video",
-            };
+            });
 
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-            // Stop audio tracks immediately to avoid Android mic conflict with SpeechRecognition
-            stream.getAudioTracks().forEach((track) => {
-                track.stop();
-                stream.removeTrack(track);
+            // Immediately stop audio tracks — SpeechRecognition manages the mic
+            // itself. Keeping them alive causes Android to block recognition.
+            stream.getAudioTracks().forEach((t) => {
+                t.stop();
+                stream.removeTrack(t);
             });
 
             if (mode === "video" && videoRef.current) {
@@ -101,153 +104,173 @@ const VoiceRecorder = ({
     };
 
     const stopStream = () => {
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach((track) => track.stop());
-        }
+        streamRef.current?.getTracks().forEach((t) => t.stop());
     };
 
-    /* ============================
-       Start Recording
-    ============================ */
-    const startRecording = () => {
+    /* ============================================================
+       RECOGNITION FACTORY — called on each user-start + auto-restart
+       ============================================================ */
+
+    const buildAndStartRecognition = () => {
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
-
         if (!SpeechRecognition) {
             alert("Speech Recognition not supported. Use Chrome.");
             return;
         }
 
-        // Destroy old instance cleanly
-        if (recognitionRef.current) {
-            recognitionRef.current.onend = null;
-            recognitionRef.current.stop();
-            recognitionRef.current = null;
-        }
+        const rec = new SpeechRecognition();
+        rec.continuous = true;
+        rec.interimResults = true;
+        rec.lang = "en-IN";
 
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-IN";
-
-        // Reset state for new session
-        finalTextRef.current = "";
-        setLiveText("");
-        setTimeLeft(maxDuration);
-        setListening(true);
-        startTimeRef.current = Date.now();
-
-        recognition.onresult = (event) => {
-            let currentInterim = "";
+        /* ── onresult ────────────────────────────────────────────────────────
+         *
+         * TWO bugs we defend against here:
+         *
+         * BUG 1 — Replay after restart:
+         *   Android sends the full history as new results after every restart.
+         *   We strip the session snapshot (= what was confirmed before restart).
+         *
+         * BUG 2 — Expanding interim accumulation:
+         *   Android sends expanding partials: "hello" → "hello my" → "hello my name"
+         *   If you concat these you get "hello hello my hello my name".
+         *   Fix: OVERWRITE interimText, never append to it.
+         *
+         * ──────────────────────────────────────────────────────────────────── */
+        rec.onresult = (event) => {
+            let interimText = "";
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                // ✅ Robust dedup: normalize before comparing to handle
-                //    punctuation and capitalization differences on Android Chrome
-                let transcript = stripConfirmed(
-                    finalTextRef.current,
-                    event.results[i][0].transcript
-                );
+                const raw = event.results[i][0].transcript;
+                // Strip replayed prefix using the snapshot frozen at session start
+                const fresh = stripSessionSnapshot(snapshotRef.current, raw);
 
                 if (event.results[i].isFinal) {
-                    const newText = transcript.trim();
-                    if (newText) {
-                        finalTextRef.current +=
-                            (finalTextRef.current ? " " : "") + newText;
+                    if (fresh) {
+                        confirmedRef.current +=
+                            (confirmedRef.current ? " " : "") + fresh;
+
+                        // Keep snapshot current so mid-session replays are caught too
+                        snapshotRef.current = confirmedRef.current;
                     }
                 } else {
-                    // ✅ Overwrite, never concatenate interim results.
-                    //    The last interim is always the most complete guess.
-                    if (transcript.trim()) {
-                        currentInterim = transcript.trim();
-                    }
+                    // OVERWRITE — never concatenate interims
+                    if (fresh) interimText = fresh;
                 }
             }
 
-            const combined =
-                finalTextRef.current +
-                (currentInterim ? " " + currentInterim : "");
-            setLiveText(combined.trim());
+            setLiveText(
+                (confirmedRef.current + (interimText ? " " + interimText : "")).trim()
+            );
         };
 
-        recognition.onerror = (event) => {
-            // no-speech and aborted are transient; onend handles restart
-            if (event.error !== "no-speech" && event.error !== "aborted") {
-                console.error("Speech error:", event.error);
-            }
+        /* ── onerror ── */
+        rec.onerror = (event) => {
+            // Transient — onend will handle restart
+            if (event.error === "no-speech" || event.error === "aborted") return;
+
+            console.error("Recognition error:", event.error);
+
             if (event.error === "not-allowed") {
                 alert("Microphone permission denied.");
-                stopRecordingProcess();
+                stopEverything();
             }
         };
 
-        // ✅ Auto-restart using ref (not stale state closure)
-        recognition.onend = () => {
-            if (listeningRef.current) {
-                setTimeout(() => {
-                    try {
-                        recognition.start();
-                    } catch (err) {
-                        // Ignore: may have been stopped intentionally
-                    }
-                }, 200);
-            }
+        /* ── onend: auto-restart while user is listening ── */
+        rec.onend = () => {
+            if (!listeningRef.current) return;
+
+            // Freeze snapshot at this exact moment before restarting.
+            // The new session will strip everything up to here.
+            snapshotRef.current = confirmedRef.current;
+
+            setTimeout(() => {
+                if (!listeningRef.current) return;
+                try {
+                    rec.start();
+                } catch (_) {
+                    // Already running or destroyed — safe to ignore
+                }
+            }, 150);
         };
 
-        recognition.start();
-        recognitionRef.current = recognition;
+        rec.start();
+        recognitionRef.current = rec;
+    };
+
+    /** Cleanly destroy the current recognition instance */
+    const killRecognition = () => {
+        if (!recognitionRef.current) return;
+        // Null out handlers BEFORE stop() to prevent ghost restarts
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onresult = null;
+        try { recognitionRef.current.stop(); } catch (_) { }
+        recognitionRef.current = null;
+    };
+
+    /* ============================================================
+       START (user presses Start Recording)
+       ============================================================ */
+
+    const startRecording = () => {
+        killRecognition();
+
+        // Full reset
+        confirmedRef.current = "";
+        snapshotRef.current = "";
+        setLiveText("");
+        setTimeLeft(maxDuration);
+        startTimeRef.current = Date.now();
+        setListening(true);
+
+        buildAndStartRecognition();
 
         // Countdown timer
         timerRef.current = setInterval(() => {
             setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    finishSession();
-                    return 0;
-                }
+                if (prev <= 1) { finishSession(); return 0; }
                 return prev - 1;
             });
         }, 1000);
     };
 
-    /* ============================
-       Stop Recording
-    ============================ */
-    const stopRecordingProcess = () => {
-        if (recognitionRef.current) {
-            recognitionRef.current.onend = null; // ✅ prevent ghost restart
-            recognitionRef.current.stop();
-            recognitionRef.current = null;
-        }
+    /* ============================================================
+       STOP
+       ============================================================ */
 
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-        }
-
+    const stopEverything = () => {
+        killRecognition();
+        clearInterval(timerRef.current);
+        timerRef.current = null;
         setListening(false);
     };
 
     const finishSession = () => {
-        stopRecordingProcess();
-
+        stopEverything();
         if (onRecordComplete) {
             const duration = startTimeRef.current
-                ? Math.abs((Date.now() - startTimeRef.current) / 1000)
+                ? (Date.now() - startTimeRef.current) / 1000
                 : 0;
-
-            onRecordComplete(finalTextRef.current.trim(), duration);
+            onRecordComplete(confirmedRef.current.trim(), duration);
         }
     };
 
-    /* ============================
+    /* ============================================================
        UI
-    ============================ */
+       ============================================================ */
+
     return (
         <div className="w-full flex flex-col md:flex-row gap-4 bg-black text-white rounded-lg overflow-hidden relative border-4 border-yellow-500 shadow-lg">
 
-            {/* Media Area */}
+            {/* ── Media Area ── */}
             <div className="relative w-full md:w-2/3 bg-gray-900 flex items-center justify-center min-h-[300px]">
 
-                {hasPermission === null && <p>Requesting Media Access...</p>}
+                {hasPermission === null && (
+                    <p className="text-gray-400">Requesting media access…</p>
+                )}
 
                 {hasPermission === false && (
                     <div className="text-center text-red-400">
@@ -274,26 +297,25 @@ const VoiceRecorder = ({
                 )}
             </div>
 
-            {/* Transcript Panel */}
+            {/* ── Transcript Panel ── */}
             <div className="flex md:w-1/3 bg-gray-900 p-6 flex-col border-l border-gray-800">
                 <h3 className="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">
                     Live Transcript
                 </h3>
-
-                <div className="flex-1 overflow-y-auto font-mono text-gray-300">
+                <div className="flex-1 overflow-y-auto font-mono text-gray-300 text-sm leading-relaxed">
                     {liveText ? (
                         <p>{liveText}</p>
                     ) : (
                         <p className="text-gray-600 italic">
                             {listening
-                                ? "Listening..."
-                                : 'Click "Start Recording" and speak clearly.'}
+                                ? "Listening…"
+                                : 'Press "Start Recording" and speak clearly.'}
                         </p>
                     )}
                 </div>
             </div>
 
-            {/* Controls */}
+            {/* ── Controls ── */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4">
                 {!listening ? (
                     <button
