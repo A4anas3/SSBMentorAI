@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Clock, Send, CheckCircle, Mic, MicOff } from "lucide-react";
 import { useWatTestDetail, useWatTestSubmit } from "@/hooks/wat/useWat";
-import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import useWebSpeechRecognition from "@/hooks/useWebSpeechRecognition";
 import SrtAnalysisResult from "@/components/SrtAnalysisResult";
 
 const WORD_TIME = 15;
@@ -32,7 +32,7 @@ const WatPracticeDetail = () => {
     stopRecording,
     resetTranscript,
     error: voiceError
-  } = useSpeechRecognition();
+  } = useWebSpeechRecognition();
 
   const tickAudio = useRef(null);
   const currentWord = words[currentIndex];

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Clock, Send, CheckCircle, Mic, MicOff } from "lucide-react";
 import { useSrtTestDetail, useSrtTestSubmit } from "@/hooks/srt/useSrt";
-import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import useWebSpeechRecognition from "@/hooks/useWebSpeechRecognition";
 import SrtAnalysisResult from "@/components/SrtAnalysisResult";
 
 const SITUATION_TIME = 30;
@@ -33,7 +33,7 @@ const SrtPracticeDetail = () => {
     stopRecording,
     resetTranscript,
     error: voiceError
-  } = useSpeechRecognition();
+  } = useWebSpeechRecognition();
 
   const tickAudio = useRef(null);
   const currentSituation = situations[currentIndex];

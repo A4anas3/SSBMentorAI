@@ -38,6 +38,31 @@ const VoiceRecorder = ({
         }
     }, [isListening, error]);
 
+    // Timer logic now triggered only when we actually start listening
+    useEffect(() => {
+        if (isListening && !timerRef.current) {
+            timerRef.current = setInterval(() => {
+                setTimeLeft((prev) => {
+                    if (prev <= 1) {
+                        finishSession();
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        } else if (!isListening && timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [isListening]); // eslint-disable-next-line react-hooks/exhaustive-deps
+
     /* ── Media init ── */
     useEffect(() => {
         initMedia();
@@ -79,13 +104,6 @@ const VoiceRecorder = ({
         startTimeRef.current = Date.now();
 
         startDeepgram();
-
-        timerRef.current = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) { finishSession(); return 0; }
-                return prev - 1;
-            });
-        }, 1000);
     };
 
     /* ============================================================
@@ -183,8 +201,8 @@ const VoiceRecorder = ({
                         onClick={startRecordingSession}
                         disabled={isStarting}
                         className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg transition ${isStarting
-                                ? "bg-gray-600 cursor-not-allowed opacity-75"
-                                : "bg-green-600 hover:bg-green-700"
+                            ? "bg-gray-600 cursor-not-allowed opacity-75"
+                            : "bg-green-600 hover:bg-green-700"
                             }`}
                     >
                         <Mic size={20} /> {isStarting ? "Starting..." : "Start Recording"}
