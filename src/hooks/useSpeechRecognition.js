@@ -8,6 +8,9 @@ const useSpeechRecognition = () => {
 
     const recognitionRef = useRef(null);
 
+    // ✅ Single source of truth for confirmed text — synchronous, no async issues
+    const confirmedTranscriptRef = useRef("");
+
     useEffect(() => {
         const SpeechRecognition =
             window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -20,7 +23,7 @@ const useSpeechRecognition = () => {
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = "en-IN"; // Default to Indian English
+        recognition.lang = "en-IN";
 
         recognition.onstart = () => {
             setIsListening(true);
@@ -28,7 +31,8 @@ const useSpeechRecognition = () => {
         };
 
         recognition.onend = () => {
-            // If we're supposed to be listening, auto-restart (handles no-speech timeout)
+            // Auto-restart if we're still supposed to be listening
+            // (Android Chrome stops recognition after ~60s of silence)
             if (recognitionRef.current?._shouldBeListening) {
                 try {
                     recognition.start();
@@ -41,16 +45,17 @@ const useSpeechRecognition = () => {
         };
 
         recognition.onerror = (event) => {
-            console.error("Speech recognition error", event.error);
+            console.error("Speech recognition error:", event.error);
 
-            // no-speech and aborted are transient — let onend handle the restart
+            // These are transient — onend will handle the restart
             if (event.error === "no-speech" || event.error === "aborted") {
                 return;
             }
 
-            // For real errors, stop listening
+            // Real errors — stop everything
             recognitionRef.current._shouldBeListening = false;
             setIsListening(false);
+
             if (event.error === "not-allowed") {
                 setError("Microphone permission denied.");
             } else if (event.error === "network") {
@@ -69,30 +74,33 @@ const useSpeechRecognition = () => {
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let t = event.results[i][0].transcript.trim();
 
-                // Android Chrome duplicate workaround
-                // Look at the existing main transcript state to avoid duplicating history
-                setTranscript((currentFullTranscript) => {
-                    const finalStr = currentFullTranscript.trim().toLowerCase();
-                    if (finalStr && t.toLowerCase().startsWith(finalStr)) {
-                        t = t.substring(finalStr.length).trim();
-                    }
-                    return currentFullTranscript; // No state change here, just checking
-                });
+                // ✅ Android Chrome Dedup Fix:
+                // On restart, Android replays already-confirmed text as new results.
+                // We compare synchronously against the ref (not state) to strip duplicates.
+                const confirmed = confirmedTranscriptRef.current.trim().toLowerCase();
+                if (confirmed && t.toLowerCase().startsWith(confirmed)) {
+                    t = t.substring(confirmed.length).trim();
+                }
 
                 if (event.results[i].isFinal) {
                     if (t) {
                         finalTrans += t + " ";
                     }
                 } else {
+                    // Don't concatenate interim results — the last one is the
+                    // most complete guess. Concatenating causes repeated words.
                     if (t) {
-                        currentInterim = t; // overwrite, don't concatenate interims
+                        currentInterim = t;
                     }
                 }
             }
 
             if (finalTrans) {
-                setTranscript((prev) => prev + finalTrans);
+                // ✅ Update ref immediately (synchronous) so next onresult can dedup correctly
+                confirmedTranscriptRef.current += finalTrans;
+                setTranscript(confirmedTranscriptRef.current);
             }
+
             setInterimTranscript(currentInterim);
         };
 
@@ -100,6 +108,7 @@ const useSpeechRecognition = () => {
 
         return () => {
             if (recognitionRef.current) {
+                recognitionRef.current._shouldBeListening = false;
                 recognitionRef.current.stop();
             }
         };
@@ -124,6 +133,8 @@ const useSpeechRecognition = () => {
     }, []);
 
     const resetTranscript = useCallback(() => {
+        // ✅ Clear ref too, otherwise dedup will strip new speech thinking it's a duplicate
+        confirmedTranscriptRef.current = "";
         setTranscript("");
         setInterimTranscript("");
     }, []);
