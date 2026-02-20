@@ -75,7 +75,9 @@ const useSpeechRecognition = () => {
                 } catch (e) {
                     console.warn("Failed to start MediaRecorder with timeslice, trying without:", e);
                     try {
-                        mediaRecorder.start();
+                        if (mediaRecorder.state === 'inactive') {
+                            mediaRecorder.start();
+                        }
                         // Polyfill timeslice by manually requesting data
                         const requestInterval = setInterval(() => {
                             if (mediaRecorder.state === 'recording') {
