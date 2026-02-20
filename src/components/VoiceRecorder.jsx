@@ -61,15 +61,21 @@ const VoiceRecorder = ({
     const killRecognition = () => {
         intentionalCloseRef.current = true;
         if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-            mediaRecorderRef.current.stop();
+            try {
+                mediaRecorderRef.current.stop();
+            } catch (e) {
+                console.warn("Error stopping media recorder", e);
+            }
         }
-        if (socketRef.current) {
-            if (socketRef.current.readyState === 1) {
-                socketRef.current.send(JSON.stringify({ type: "CloseStream" }));
+
+        const oldWs = socketRef.current;
+        if (oldWs) {
+            if (oldWs.readyState === 1) {
+                oldWs.send(JSON.stringify({ type: "CloseStream" }));
             }
             setTimeout(() => {
-                if (socketRef.current && socketRef.current.readyState === 1) {
-                    socketRef.current.close();
+                if (oldWs.readyState === 1 || oldWs.readyState === 0) {
+                    oldWs.close();
                 }
             }, 500);
         }
@@ -89,7 +95,15 @@ const VoiceRecorder = ({
                 await initMedia();
             }
 
-            const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: 'audio/webm' });
+            let mimeType = 'audio/webm';
+            if (typeof MediaRecorder.isTypeSupported === 'function' && !MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'audio/mp4';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = '';
+                }
+            }
+
+            const mediaRecorder = new MediaRecorder(streamRef.current, mimeType ? { mimeType } : undefined);
             mediaRecorderRef.current = mediaRecorder;
 
             const ws = new WebSocket(
@@ -105,7 +119,11 @@ const VoiceRecorder = ({
                 });
 
                 // Low latency chunks
-                mediaRecorder.start(250);
+                try {
+                    mediaRecorder.start(250);
+                } catch (e) {
+                    console.error("Failed to start MediaRecorder:", e);
+                }
             };
 
             ws.onmessage = (message) => {
@@ -127,11 +145,13 @@ const VoiceRecorder = ({
             };
 
             ws.onclose = () => {
+                if (socketRef.current !== ws) return; // ignore old sockets closing
+
                 if (!intentionalCloseRef.current) {
                     console.log("Deepgram WS expired/closed naturally. Reconnecting...");
                     setTimeout(() => {
                         // Double check we haven't been stopped in the meantime
-                        if (!intentionalCloseRef.current) {
+                        if (socketRef.current === ws && !intentionalCloseRef.current) {
                             startDeepgram();
                         }
                     }, 500);

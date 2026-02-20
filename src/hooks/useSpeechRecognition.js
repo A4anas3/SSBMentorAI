@@ -16,6 +16,19 @@ const useSpeechRecognition = () => {
         try {
             setError(null);
 
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                try { mediaRecorderRef.current.stop(); } catch (e) { }
+            }
+            if (socketRef.current) {
+                const oldWs = socketRef.current;
+                if (oldWs.readyState === 1) oldWs.send(JSON.stringify({ type: "CloseStream" }));
+                setTimeout(() => {
+                    if (oldWs.readyState === 1 || oldWs.readyState === 0) oldWs.close();
+                }, 500);
+            }
+            mediaRecorderRef.current = null;
+            socketRef.current = null;
+
             // 1. Get Token
             const token = await getDeepgramToken();
             if (!token) {
@@ -30,7 +43,15 @@ const useSpeechRecognition = () => {
             }
 
             // Use MediaRecorder (supported by Deepgram)
-            const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: 'audio/webm' });
+            let mimeType = 'audio/webm';
+            if (typeof MediaRecorder.isTypeSupported === 'function' && !MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'audio/mp4';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = '';
+                }
+            }
+
+            const mediaRecorder = new MediaRecorder(streamRef.current, mimeType ? { mimeType } : undefined);
             mediaRecorderRef.current = mediaRecorder;
 
             // 3. Connect to Deepgram WebSocket
@@ -49,7 +70,11 @@ const useSpeechRecognition = () => {
                 });
 
                 // Send audio chunks every 250ms for low latency
-                mediaRecorder.start(250);
+                try {
+                    mediaRecorder.start(250);
+                } catch (e) {
+                    console.error("Failed to start MediaRecorder:", e);
+                }
             };
 
             ws.onmessage = (message) => {
@@ -68,10 +93,12 @@ const useSpeechRecognition = () => {
             };
 
             ws.onclose = () => {
+                if (socketRef.current !== ws) return; // ignore old sockets
+
                 if (!intentionalCloseRef.current) {
                     console.log("Deepgram WS closed unexpectedly. Reconnecting...");
                     setTimeout(() => {
-                        if (!intentionalCloseRef.current) {
+                        if (socketRef.current === ws && !intentionalCloseRef.current) {
                             connectDeepgram();
                         }
                     }, 500);
@@ -107,24 +134,32 @@ const useSpeechRecognition = () => {
     const stopRecording = useCallback(() => {
         intentionalCloseRef.current = true;
         if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-            mediaRecorderRef.current.stop();
+            try {
+                mediaRecorderRef.current.stop();
+            } catch (e) {
+                console.warn("Error stopping media recorder", e);
+            }
         }
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
         }
-        if (socketRef.current) {
+
+        const oldWs = socketRef.current;
+        if (oldWs) {
             // Signal Deepgram that the stream is closing to get the final transcript
-            if (socketRef.current.readyState === 1) {
-                socketRef.current.send(JSON.stringify({ type: "CloseStream" }));
+            if (oldWs.readyState === 1) {
+                oldWs.send(JSON.stringify({ type: "CloseStream" }));
             }
 
             // Give it a brief moment to process the final message before closing
             setTimeout(() => {
-                if (socketRef.current && socketRef.current.readyState === 1) {
-                    socketRef.current.close();
+                if (oldWs.readyState === 1 || oldWs.readyState === 0) {
+                    oldWs.close();
                 }
             }, 500);
         }
+        mediaRecorderRef.current = null;
+        socketRef.current = null;
         setIsListening(false);
     }, []);
 
