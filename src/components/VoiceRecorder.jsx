@@ -2,8 +2,40 @@ import React, { useState, useRef, useEffect } from "react";
 import { Mic, Square, VideoOff, Timer } from "lucide-react";
 
 /**
+ * Normalize string for comparison:
+ * - lowercase
+ * - strip punctuation
+ * - collapse whitespace
+ */
+const normalize = (str) =>
+    str
+        .toLowerCase()
+        .replace(/[^\w\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+/**
+ * Strip the already-confirmed portion from a new transcript.
+ * Uses word-count based slicing on the original (preserving case/punctuation)
+ * after confirming a match on the normalized version.
+ */
+const stripConfirmed = (confirmedText, newTranscript) => {
+    const normalizedConfirmed = normalize(confirmedText);
+    const normalizedNew = normalize(newTranscript);
+
+    if (!normalizedConfirmed || !normalizedNew.startsWith(normalizedConfirmed)) {
+        return newTranscript; // no match, return as-is
+    }
+
+    // Count words in confirmed text, then slice that many from the new transcript
+    const confirmedWordCount = normalizedConfirmed.split(" ").filter(Boolean).length;
+    const newWords = newTranscript.trim().split(/\s+/);
+    return newWords.slice(confirmedWordCount).join(" ").trim();
+};
+
+/**
  * VoiceRecorder Component
- * Stable version with duplicate prevention + Android Chrome fixes
+ * Fixed: robust Android Chrome duplicate prevention using normalized word-based dedup
  */
 const VoiceRecorder = ({
     onRecordComplete,
@@ -24,7 +56,7 @@ const VoiceRecorder = ({
     const listeningRef = useRef(false);
 
     /* ============================
-       Keep listening ref updated
+       Keep listening ref in sync
     ============================ */
     useEffect(() => {
         listeningRef.current = listening;
@@ -50,9 +82,8 @@ const VoiceRecorder = ({
 
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-            // Important: stop audio track to avoid Android conflict
-            const audioTracks = stream.getAudioTracks();
-            audioTracks.forEach((track) => {
+            // Stop audio tracks immediately to avoid Android mic conflict with SpeechRecognition
+            stream.getAudioTracks().forEach((track) => {
                 track.stop();
                 stream.removeTrack(track);
             });
@@ -87,8 +118,9 @@ const VoiceRecorder = ({
             return;
         }
 
-        // Stop old instance if exists
+        // Destroy old instance cleanly
         if (recognitionRef.current) {
+            recognitionRef.current.onend = null;
             recognitionRef.current.stop();
             recognitionRef.current = null;
         }
@@ -98,6 +130,7 @@ const VoiceRecorder = ({
         recognition.interimResults = true;
         recognition.lang = "en-IN";
 
+        // Reset state for new session
         finalTextRef.current = "";
         setLiveText("");
         setTimeLeft(maxDuration);
@@ -108,35 +141,36 @@ const VoiceRecorder = ({
             let currentInterim = "";
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                let transcript = event.results[i][0].transcript.trim();
-
-                // Android Chrome duplicate workaround: The engine often repeats confirmed text
-                // in the new results. We strip it if the new transcript starts with the confirmed text.
-                const finalStr = finalTextRef.current.trim().toLowerCase();
-                if (finalStr && transcript.toLowerCase().startsWith(finalStr)) {
-                    transcript = transcript.substring(finalStr.length).trim();
-                }
+                // ✅ Robust dedup: normalize before comparing to handle
+                //    punctuation and capitalization differences on Android Chrome
+                let transcript = stripConfirmed(
+                    finalTextRef.current,
+                    event.results[i][0].transcript
+                );
 
                 if (event.results[i].isFinal) {
                     const newText = transcript.trim();
                     if (newText) {
-                        finalTextRef.current += (finalTextRef.current ? " " : "") + newText;
+                        finalTextRef.current +=
+                            (finalTextRef.current ? " " : "") + newText;
                     }
                 } else {
-                    // Critical fix for repetition: If there are multiple interim results, 
-                    // DO NOT concatenate them. The last one is the most complete guess.
-                    // E.g. ["hello", "hello my"] -> take "hello my"
+                    // ✅ Overwrite, never concatenate interim results.
+                    //    The last interim is always the most complete guess.
                     if (transcript.trim()) {
                         currentInterim = transcript.trim();
                     }
                 }
             }
 
-            const combined = finalTextRef.current + (currentInterim ? " " + currentInterim : "");
+            const combined =
+                finalTextRef.current +
+                (currentInterim ? " " + currentInterim : "");
             setLiveText(combined.trim());
         };
 
         recognition.onerror = (event) => {
+            // no-speech and aborted are transient; onend handles restart
             if (event.error !== "no-speech" && event.error !== "aborted") {
                 console.error("Speech error:", event.error);
             }
@@ -146,13 +180,15 @@ const VoiceRecorder = ({
             }
         };
 
-        // Safe auto restart
+        // ✅ Auto-restart using ref (not stale state closure)
         recognition.onend = () => {
             if (listeningRef.current) {
                 setTimeout(() => {
                     try {
                         recognition.start();
-                    } catch (err) { }
+                    } catch (err) {
+                        // Ignore: may have been stopped intentionally
+                    }
                 }, 200);
             }
         };
@@ -160,7 +196,7 @@ const VoiceRecorder = ({
         recognition.start();
         recognitionRef.current = recognition;
 
-        // Timer
+        // Countdown timer
         timerRef.current = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
@@ -177,7 +213,7 @@ const VoiceRecorder = ({
     ============================ */
     const stopRecordingProcess = () => {
         if (recognitionRef.current) {
-            recognitionRef.current.onend = null;
+            recognitionRef.current.onend = null; // ✅ prevent ghost restart
             recognitionRef.current.stop();
             recognitionRef.current = null;
         }
