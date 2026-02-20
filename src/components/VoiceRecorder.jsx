@@ -19,6 +19,7 @@ const VoiceRecorder = ({
 
     const [timeLeft, setTimeLeft] = useState(maxDuration);
     const [hasPermission, setHasPermission] = useState(null);
+    const [isStarting, setIsStarting] = useState(false);
 
     const videoRef = useRef(null);
     const streamRef = useRef(null);
@@ -30,6 +31,12 @@ const VoiceRecorder = ({
     useEffect(() => {
         transcriptRef.current = (transcript + (interimTranscript ? " " + interimTranscript : "")).trim();
     }, [transcript, interimTranscript]);
+
+    useEffect(() => {
+        if (isListening || error) {
+            setIsStarting(false);
+        }
+    }, [isListening, error]);
 
     /* ── Media init ── */
     useEffect(() => {
@@ -64,6 +71,8 @@ const VoiceRecorder = ({
        ============================================================ */
 
     const startRecordingSession = () => {
+        if (isStarting) return;
+        setIsStarting(true);
         resetTranscript();
         transcriptRef.current = "";
         setTimeLeft(maxDuration);
@@ -172,9 +181,13 @@ const VoiceRecorder = ({
                 {!isListening ? (
                     <button
                         onClick={startRecordingSession}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-8 py-3 rounded-full font-bold shadow-lg transition"
+                        disabled={isStarting}
+                        className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold shadow-lg transition ${isStarting
+                                ? "bg-gray-600 cursor-not-allowed opacity-75"
+                                : "bg-green-600 hover:bg-green-700"
+                            }`}
                     >
-                        <Mic size={20} /> Start Recording
+                        <Mic size={20} /> {isStarting ? "Starting..." : "Start Recording"}
                     </button>
                 ) : (
                     <button
